@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package uff.midiacom.goosegenerator;
+package uff.midiacom.goose;
 
 import uff.midiacom.model.GooseMessage;
 import java.util.ArrayList;
@@ -68,6 +68,15 @@ public final class GooseEventManager {
             }
         }
         return lastGooseMessage;
+    }
+    
+    public GooseMessage getPreviousGoose(GooseMessage gooseMessage) {
+        for (int i = 0; i < gooseMessages.size(); i++) {
+            if (gooseMessage.equals(gooseMessages.get(i))) {
+                return gooseMessages.get(i-1);
+            }
+        }
+        return null;
     }
 
     public ArrayList<GooseMessage> generateGooseMessages() {

@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
-import uff.midiacom.goosegenerator.GooseEventManager;
+import uff.midiacom.goose.GooseEventManager;
 import uff.midiacom.model.GooseMessage;
 
 /**
@@ -28,9 +28,14 @@ public class UC05 extends AbstractUseCase{
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
+
+    //Injection
     public static void run(String filename) throws FileNotFoundException, IOException {
+        System.out.println("Run: "+ filename);
         outputFile = outputLocation + filename;
         UC05 extractor = new UC05();
+        extractor.attackType = "injection";
+
         extractor.gooseEventManager = new GooseEventManager(false, 0, 0, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
         
         extractor.startWriting();
@@ -98,11 +103,8 @@ public class UC05 extends AbstractUseCase{
         GooseMessage.test = "TRUE";
         GooseMessage.ndsCom = "TRUE";
         GooseMessage.protocol = "SV";
-        GooseMessage.frameLen = 249;
         GooseMessage.gooseTimeAllowedtoLive = 1000;
-        GooseMessage.gooseLen = 227;
         GooseMessage.numDatSetEntries = 26;
-        GooseMessage.APDUSize = 219;
         GooseMessage.confRev = 2;
 
         
@@ -110,13 +112,14 @@ public class UC05 extends AbstractUseCase{
             "{" + GooseMessage.ethSrc + ", "+ethSrc+"}", "{" + GooseMessage.ethType + ", "+ethType+"}", "numeric", "{" + GooseMessage.gooseAppid + ", "+gooseAppid+"}", "numeric", 
             "{" + GooseMessage.TPID + ", "+TPID+"}","{" + GooseMessage.gocbRef + ", "+gocbRef+"}", "{"+datSet+", " + GooseMessage.datSet + "}", "{" + GooseMessage.goID + ", "+goID+"}",
             "{" + GooseMessage.test + ", " + test + "}", "numeric", "{" + GooseMessage.ndsCom + ", " + ndsCom + "}", "numeric", "numeric", "{" + GooseMessage.protocol + ", "+protocol+"}"};      
-        String label[] = {"normal","attack"};
 
          /* Write Header and Columns */
         if(printHeader){
             if(defaultHeader){
+                System.out.println("Default header...");
                 writeDefaultHeader();
             } else {
+                System.out.println("Not default.");
                 write("@relation compiledtraffic");
 
                 for (String column : columns) {
@@ -132,7 +135,16 @@ public class UC05 extends AbstractUseCase{
                     write("@attribute "+columnsGOOSE[i]+" "+columnsGOOSEType[i]);
                 }
 
-                write("@attribute @class@ {"+label[0]+", "+label[1]+"}");
+                String classLine = "@attribute @class@ {" +
+                        label[0] + ", "+
+                        label[1] + ", "+
+                        label[2] + ", "+
+                        label[3] + ", "+
+                        label[4] + ", "+
+                        label[5] +
+                        "}";
+                
+                write(classLine);
                 write("@data");
             }
             printHeader = false;
@@ -145,7 +157,7 @@ public class UC05 extends AbstractUseCase{
             Random gooseRandom = new Random(1000);
             int gooseTime = gooseRandom.nextInt(); // random index, random SV messages
             
-            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," +gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull()+"," + label[1];
+            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," +gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull()+"," + label[5];
 
             //System.out.println("line: "+line);
             write(line);

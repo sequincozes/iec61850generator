@@ -14,7 +14,8 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
-import uff.midiacom.goosegenerator.GooseEventManager;
+import uff.midiacom.goose.GooseEventManager;
+import uff.midiacom.model.GooseMessage;
 
 /**
  *
@@ -23,12 +24,13 @@ import uff.midiacom.goosegenerator.GooseEventManager;
 public abstract class AbstractUseCase {
 
     BufferedWriter bw;
-    static String outputLocation = "/home/silvio/datasets/Full_SV_2020/consistency_v2/";
+    static String outputLocation = "/home/silvio/datasets/Full_SV_2020/consistency_v3/";
     static String outputFile;
     GooseEventManager gooseEventManager;
     boolean printHeader = true;
     boolean defaultHeader = true;
     String attackType = "Abstract Attack";
+    String[] label = {"normal", "random_replay", "inverse_replay", "masquerade_fake_fault", "masquerade_fake_normal", "injection","poisoned_high_rate"};
 
     protected String joinColumns(ArrayList<Float[]> formatedCSVFile, ArrayList<Float[]> formatedCSVFile2, String columns[], String columns2[], int line) {
         String content = "";
@@ -141,7 +143,34 @@ public abstract class AbstractUseCase {
         write("@attribute  numDatSetEntries numeric");
         write("@attribute APDUSize numeric");
         write("@attribute protocol {SV, GOOSE}");
-        write("@attribute @class@ {normal,attack}");
+        String classLine = "@attribute @class@ {" +
+              label[0] + ", "+
+              label[1] + ", "+
+              label[2] + ", "+
+              label[3] + ", "+
+              label[4] + ", "+
+              label[5] + ", "+
+              label[6] +
+              "}";
+
+        write(classLine);
         write("@data");
+    }
+    
+    protected String getConsistencyFeaturesAsCSV(double time){
+        GooseMessage gm = gooseEventManager.getLastGooseFromSV(time);
+        GooseMessage prev = gooseEventManager.getPreviousGoose(gm);
+        int stDiff = gm.getStNum() - prev.getStNum();
+        int sqDiff = gm.getSqNum()- prev.getSqNum();
+        int gooseLenghtDiff = gm.getGooseLen()- prev.getGooseLen();
+        int cbStatusDiff = gm.isCbStatus()- prev.isCbStatus();
+        int apduSizeDiff = gm.getApduSize()- prev.getApduSize();
+        int frameLenthDiff = gm.getFrameLen()- prev.getFrameLen();
+        double timestampDiff = gm.getTimestamp()- prev.getTimestamp();
+        double tDiff = gm.getT() - prev.getT();
+        
+        return "," + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", " + 
+                cbStatusDiff + ", " +  apduSizeDiff + ", " + frameLenthDiff + ", " + 
+                timestampDiff + ", " + tDiff;
     }
 }

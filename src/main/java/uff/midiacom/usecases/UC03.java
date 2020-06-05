@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.StringTokenizer;
-import uff.midiacom.goosegenerator.GooseEventManager;
+import uff.midiacom.goose.GooseEventManager;
 import uff.midiacom.model.GooseMessage;
 
 /**
@@ -36,7 +36,7 @@ public class UC03 extends AbstractUseCase{
     public static void run(String filename) throws FileNotFoundException, IOException {
         outputFile = outputLocation + filename;
         UC03 extractor = new UC03();
-        extractor.attackType = "Masquerade (Fake Fault)";
+        extractor.attackType = "masquerade_fake_fault";
         // Masquerade
         extractor.gooseEventManager = new GooseEventManager(false, 0, 0, 0, new double[]{0.3, 1.1}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
         
@@ -81,7 +81,7 @@ public class UC03 extends AbstractUseCase{
             "{" + GooseMessage.ethSrc +"}", "{" + GooseMessage.ethType +"}", "numeric", "{" + GooseMessage.gooseAppid + "}", "numeric", 
             "{" + GooseMessage.TPID +"}","{" + GooseMessage.gocbRef +"}", "{"+GooseMessage.datSet + "}", "{" + GooseMessage.goID + "}",
             "{" + GooseMessage.test +  "}", "numeric", "{" + GooseMessage.ndsCom + "}", "numeric", "numeric", "{" + GooseMessage.protocol +"}"};      
-        String label[] = {"normal","attack"};
+        
         double[] labelRange = {0.3, 0.5};
 
         /* Write Header and Columns */
@@ -104,7 +104,14 @@ public class UC03 extends AbstractUseCase{
                     write("@attribute "+columnsGOOSE[i]+" "+columnsGOOSEType[i]);
                 }
 
-                write("@attribute @class@ {"+label[0]+", "+label[1]+"}");
+                write("@attribute @class@ {" +
+                        label[0] + ", "+
+                        label[1] + ", "+
+                        label[2] + ", "+
+                        label[3] + ", "+
+                        label[4] + ", "+
+                        label[5] +
+                        "}");
                 write("@data");
             }
             printHeader = false;
@@ -115,7 +122,7 @@ public class UC03 extends AbstractUseCase{
             String line = "";
             if (time < labelRange[1]) {
                 if(gooseEventManager.getLastGooseFromSV(time).isCbStatus() > 0){
-                    line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," +gooseEventManager.getLastGooseFromSV(time).asCSVFull() + "," + label[1];
+                    line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," +gooseEventManager.getLastGooseFromSV(time).asCSVFull() + "," + label[3];
                     write(line);
                 }
             } else {

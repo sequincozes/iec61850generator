@@ -16,15 +16,15 @@ public class GooseMessage {
     private int sqNum;                      // DYNAMICALLY GENERATED 
     private double t;                       // DYNAMICALLY GENERATED - Last Goose Change  
     private double timestamp;               // DYNAMICALLY GENERATED  
- 
-    
-    public static int frameLen = 240;
-    public static int gooseTimeAllowedtoLive = 11000;
-    public static int gooseLen = 226;
-    public static int numDatSetEntries = 25;
-    public static int APDUSize = 215;
-    public static int confRev = 1;
 
+    public static int gooseTimeAllowedtoLive = 11000;
+    public static int numDatSetEntries = 25;
+    public static int confRev = 1;
+    
+    //public static int APDUSize = 215;     // DYNAMICALLY GENERATED  - Use getAPDUSize()
+    //public static int gooseLen = 226;     // DYNAMICALLY GENERATED  - Use getgooseLen()
+    //public static int frameLen = 240;     // DYNAMICALLY GENERATED  - Use getFrameLen()
+    
     public static String ethDst = "01:a0:f4:08:2f:77";
     public static String ethSrc = "00:a0:f4:08:2f:77";
     public static String ethType = "0x000088b8";
@@ -33,7 +33,7 @@ public class GooseMessage {
     public static String gocbRef = "LD/LLN0$GO$gcbA";
     public static String datSet = "LD/LLN0$IntLockA";
     public static String goID = "InterlockingA";
-    public static String test = "FALSE";
+    public static String test = "0";
     public static String ndsCom = "FALSE";
     public static String protocol = "GOOSE";
 
@@ -77,12 +77,40 @@ public class GooseMessage {
         this.timestamp = timestamp;
     }
 
+    public int getFrameLen() {
+        return String.valueOf(numDatSetEntries).length()
+                + String.valueOf(gooseTimeAllowedtoLive).length()
+                + String.valueOf(cbStatus).length()
+                + String.valueOf(stNum).length()
+                + String.valueOf(timestamp).length()
+                + String.valueOf(t).length()
+                + ethDst.length()
+                + ethSrc.length()
+                + ethType.length()
+                + gooseAppid.length()
+                + TPID.length()
+                + gocbRef.length()
+                + datSet.length()
+                + goID.length()
+                + test.length()
+                + ndsCom.length()
+                + 115;
+    }
+
+    public int getGooseLen() {
+        return getFrameLen() - 14;
+    }
+
+    public int getApduSize() {
+        return getGooseLen() - 11;
+    }
+
     public String asCSVFull() {
-        return getTimestamp() + "," + getSqNum() + "," + getStNum() + "," + cbStatus + ", " + frameLen
+        return getTimestamp() + "," + getSqNum() + "," + getStNum() + "," + cbStatus + ", " + getFrameLen()
                 + ", " + ethDst + ", " + ethSrc + ", " + ethType + ", " + gooseTimeAllowedtoLive + ", " + gooseAppid
-                + ", " + gooseLen + ", " + TPID + ", " + gocbRef + ", " + datSet
+                + ", " + getGooseLen() + ", " + TPID + ", " + gocbRef + ", " + datSet
                 + ", " + goID + ", " + test + ", " + confRev + ", " + ndsCom
-                + ", " + numDatSetEntries + ", " + APDUSize + ", " + protocol;
+                + ", " + numDatSetEntries + ", " + getGooseLen() + ", " + protocol;
     }
 
     public String asCSVCompact() {
@@ -108,4 +136,8 @@ public class GooseMessage {
         }
     }
 
+    public double getT() {
+        return t;
+    }
+    
 }

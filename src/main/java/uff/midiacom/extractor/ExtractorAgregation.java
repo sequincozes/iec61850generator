@@ -16,12 +16,18 @@ import uff.midiacom.usecases.*;
 public class ExtractorAgregation {
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        //UC01.run("uc01_fullgoose.csv");
-        //UC02.run("uc02_fullgoose.csv");        
-        //UC03.run("uc03_fullgoose.csv");        
-        UC04.run("uc04_fullgoose.csv");
-        //UC05.run("uc05_fullgoose.csv");        
-        //UC00.run("uc00_fullgoose.csv");
+//        System.out.println("Will run UC01:");
+//        UC01.run("uc01_fullgoose_multiclass.csv");
+//        System.out.println("Will run UC02:");
+//        UC02.run("uc02_fullgoose_multiclass.csv");        
+//        System.out.println("Will run UC03:");
+//        UC03.run("uc03_fullgoose_multiclass.csv");        
+//        System.out.println("Will run UC04:");
+//        UC04.run("uc04_fullgoose_multiclass.csv");
+//        System.out.println("Will run UC05:");
+//        UC05.run("uc05_fullgoose_multiclass.csv");        
+        System.out.println("Will run UC00:");
+        UC00.run("uc00_fullgoose_multiclass.csv");
 
     }
 

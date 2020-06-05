@@ -8,7 +8,7 @@ package uff.midiacom.usecases;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import uff.midiacom.goosegenerator.GooseEventManager;
+import uff.midiacom.goose.GooseEventManager;
 import uff.midiacom.model.GooseMessage;
 
 /**
@@ -61,10 +61,10 @@ public class UC00 extends AbstractUseCase{
             "{" + GooseMessage.ethSrc + "}", "{" + GooseMessage.ethType + "}", "numeric", "{" + GooseMessage.gooseAppid + "}", "numeric", 
             "{" + GooseMessage.TPID + "}","{" + GooseMessage.gocbRef + "}", "{" + GooseMessage.datSet + "}", "{" + GooseMessage.goID + "}",
             "{" + GooseMessage.test + "}", "numeric", "{" + GooseMessage.ndsCom + "}", "numeric", "numeric", "{" + GooseMessage.protocol + "}"};      
-        String[] label = {"normal", "attack"};
         double[] labelRange = {0.5, 0.6};
 
        /* Write Header and Columns */
+       defaultHeader = false;
         if(printHeader){
             if(!defaultHeader){
                 writeDefaultHeader();
@@ -84,7 +84,15 @@ public class UC00 extends AbstractUseCase{
                     write("@attribute "+columnsGOOSE[i]+" "+columnsGOOSEType[i]);
                 }
 
-                write("@attribute @class@ {"+label[0]+", "+label[1]+"}");
+                write("@attribute @class@ {" +
+                        label[0] + ", "+
+                        label[1] + ", "+
+                        label[2] + ", "+
+                        label[3] + ", "+
+                        label[4] + ", "+
+                        label[5] +
+                "}");  
+                
                 write("@data");
             }
             printHeader = false;

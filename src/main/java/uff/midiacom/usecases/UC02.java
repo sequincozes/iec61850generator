@@ -8,7 +8,7 @@ package uff.midiacom.usecases;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import uff.midiacom.goosegenerator.GooseEventManager;
+import uff.midiacom.goose.GooseEventManager;
 import uff.midiacom.model.GooseMessage;
 
 /**
@@ -34,7 +34,7 @@ public class UC02 extends AbstractUseCase{
     public static void run(String filename) throws FileNotFoundException, IOException {
         outputFile = outputLocation + filename;
         UC02 extractor = new UC02();
-        extractor.attackType = "Replay (inverse)";
+        extractor.attackType = "inverse_replay";
         extractor.gooseEventManager = new GooseEventManager(false, 0, 0, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
         extractor.startWriting();
         
@@ -77,7 +77,7 @@ public class UC02 extends AbstractUseCase{
             "{" + GooseMessage.ethSrc + "}", "{" + GooseMessage.ethType + "}", "numeric", "{" + GooseMessage.gooseAppid + "}", "numeric", 
             "{" + GooseMessage.TPID + "}","{" + GooseMessage.gocbRef + "}", "{" + GooseMessage.datSet + "}", "{" + GooseMessage.goID + "}",
             "{" + GooseMessage.test + "}", "numeric", "{" + GooseMessage.ndsCom + "}", "numeric", "numeric", "{" + GooseMessage.protocol + "}"};      
-        String[] label = {"normal", "attack"};
+
   
         /* Write Header and Columns */
         if(printHeader){
@@ -99,7 +99,15 @@ public class UC02 extends AbstractUseCase{
                     write("@attribute "+columnsGOOSE[i]+" "+columnsGOOSEType[i]);
                 }
 
-                write("@attribute @class@ {"+label[0]+", "+label[1]+"}");
+                write("@attribute @class@ {" +
+                        label[0] + ", "+
+                        label[1] + ", "+
+                        label[2] + ", "+
+                        label[3] + ", "+
+                        label[4] + ", "+
+                        label[5] +
+                        "}");
+
                 write("@data");
             }
             printHeader = false;
@@ -125,7 +133,7 @@ public class UC02 extends AbstractUseCase{
 
             int gooseTime = (int)(Math.random() * (maxGoose - minGoose + 1) + minGoose); // random GOOSE inconpatible with SV
             
-            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," +gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull() +"," + label[1];
+            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," +gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull() +"," + label[2];
 
             //System.out.println("line: "+line);
             write(line);

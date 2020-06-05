@@ -15,17 +15,12 @@ import uff.midiacom.model.GooseMessage;
  *
  * @author silvio
  */
-public class UC04 extends AbstractUseCase{
-   
+public class UC06 extends AbstractUseCase{
+
     public static void run(String filename) throws FileNotFoundException, IOException {
-        UC04 extractor = new UC04();
-        extractor.attackType = "masquerade_fake_normal";
-
         outputFile = outputLocation + filename;
-
-        // Masquerade
-        extractor.gooseEventManager = new GooseEventManager(true, 1/*status incrementado*/, 0/*vai ser zerado mesmo*/, 0, new double[]{0.5, 0.6}, 0.01262/*dobro do tempo normal*/, 0.01659, 6.33000000000011f, 4, 1000);
-        
+        UC06 extractor = new UC06();
+        extractor.gooseEventManager = new GooseEventManager(false, 0, 0, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
         extractor.startWriting();
         
         int[] resistences = {10, 50, 100};
@@ -34,13 +29,13 @@ public class UC04 extends AbstractUseCase{
             for (int run = 1; run < 132; run++) {
                 switch (String.valueOf(run).length()) {
                     case 1:
-                        extractor.generateMasqueradeAttacksUC4(resistence, "00" + run);
+                        extractor.runNormalUC0(resistence, "00" + run);
                         break;
                     case 2:
-                        extractor.generateMasqueradeAttacksUC4(resistence, "0" + run);
+                        extractor.runNormalUC0(resistence, "0" + run);
                         break;
                     default:
-                        extractor.generateMasqueradeAttacksUC4(resistence, String.valueOf(run));
+                        extractor.runNormalUC0(resistence, String.valueOf(run));
                         break;
                 }
             }
@@ -49,7 +44,7 @@ public class UC04 extends AbstractUseCase{
         extractor.finishWriting();
     }
 
-    private void generateMasqueradeAttacksUC4(int res, String num) throws IOException {
+    private void runNormalUC0(int res, String num) throws IOException {
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};
@@ -59,17 +54,19 @@ public class UC04 extends AbstractUseCase{
         String columns2[] = {"Time", "vsmB", "vsmC"};
         ArrayList<Float[]> formatedCSVFile2 = consumeFloat("/home/silvio/datasets/Full_SV_2020/resistencia" + res + "/SILVIO_r00" + num + "_02.out", 1, columns2);
 
+        
         /* Generate GOOSE Part */
         String columnsGOOSE[] = {"GooseTimestamp","SqNum", "StNum", "cbStatus","frameLen", "ethDst", "ethSrc", "ethType", "gooseTimeAllowedtoLive", "gooseAppid", "gooseLen", "TPID", "gocbRef", "datSet", "goID", "test", "confRev", "ndsCom", " numDatSetEntries", "APDUSize", "protocol"};      
         String columnsGOOSEType[] = {"numeric", "numeric", "numeric", "numeric", "numeric", "{" + GooseMessage.ethDst + "}", 
             "{" + GooseMessage.ethSrc + "}", "{" + GooseMessage.ethType + "}", "numeric", "{" + GooseMessage.gooseAppid + "}", "numeric", 
             "{" + GooseMessage.TPID + "}","{" + GooseMessage.gocbRef + "}", "{" + GooseMessage.datSet + "}", "{" + GooseMessage.goID + "}",
             "{" + GooseMessage.test + "}", "numeric", "{" + GooseMessage.ndsCom + "}", "numeric", "numeric", "{" + GooseMessage.protocol + "}"};      
-        
-  
-         /* Write Header and Columns */
+        double[] labelRange = {0.5, 0.6};
+
+       /* Write Header and Columns */
+       defaultHeader = false;
         if(printHeader){
-            if(defaultHeader){
+            if(!defaultHeader){
                 writeDefaultHeader();
             } else {
                 write("@relation compiledtraffic");
@@ -93,27 +90,36 @@ public class UC04 extends AbstractUseCase{
                         label[2] + ", "+
                         label[3] + ", "+
                         label[4] + ", "+
-                        label[5] +
-                        "}");                
+                        label[5] + ", "+
+                        label[6] +
+                "}");  
+                
                 write("@data");
             }
             printHeader = false;
         }
-         
-        double[] writingRange = {0.5, 0.6};
-
+        
+        GooseMessage poisonedGoose = null;
+        
+        
         for (int i = 0; i < formatedCSVFile2.size() - 1; i++) {
-            float time = formatedCSVFile2.get(i)[0];
+            float time = formatedCSVFile2.get(i)[0]; 
+            if (time > 500){
+                break; // Generate only messages when not fault is occuring
+            }
+            
             String line = "";
-            if (time >= writingRange[1]) {
-                break;
-            } else if (time >= writingRange[0]) {
-                if(gooseEventManager.getLastGooseFromSV(time).isCbStatus() == 0){
-                    line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," +gooseEventManager.getLastGooseFromSV(time).asCSVFull()+ "," + label[4];
-                    write(line);
-                }
-            } 
+            if(poisonedGoose==null){
+                poisonedGoose = gooseEventManager.getLastGooseFromSV(time);
+            }
+            
+            poisonedGoose.setStNum(poisonedGoose.getStNum() + 1);
+            line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," 
+                    + poisonedGoose.asCSVFull() + getConsistencyFeaturesAsCSV(time) + "," + label[0];           
+            write(line);
+            
         }
-    }  
-    
+
+    }
+     
 }
