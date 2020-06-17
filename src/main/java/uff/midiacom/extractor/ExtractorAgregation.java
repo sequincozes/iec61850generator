@@ -26,8 +26,10 @@ public class ExtractorAgregation {
 //        UC04.run("uc04_fullgoose_multiclass.csv");
 //        System.out.println("Will run UC05:");
 //        UC05.run("uc05_fullgoose_multiclass.csv");        
-        System.out.println("Will run UC00:");
-        UC00.run("uc00_fullgoose_multiclass.csv");
+        //System.out.println("Will run UC00:");
+        //UC00.run("uc00_fullgoose.csv");
+        System.out.println("Will run UC06:");
+        UC06.run("uc06_fullgoose.csv");
 
     }
 

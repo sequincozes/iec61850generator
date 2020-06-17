@@ -20,11 +20,10 @@ public class GooseMessage {
     public static int gooseTimeAllowedtoLive = 11000;
     public static int numDatSetEntries = 25;
     public static int confRev = 1;
-    
+
     //public static int APDUSize = 215;     // DYNAMICALLY GENERATED  - Use getAPDUSize()
     //public static int gooseLen = 226;     // DYNAMICALLY GENERATED  - Use getgooseLen()
     //public static int frameLen = 240;     // DYNAMICALLY GENERATED  - Use getFrameLen()
-    
     public static String ethDst = "01:a0:f4:08:2f:77";
     public static String ethSrc = "00:a0:f4:08:2f:77";
     public static String ethType = "0x000088b8";
@@ -33,7 +32,7 @@ public class GooseMessage {
     public static String gocbRef = "LD/LLN0$GO$gcbA";
     public static String datSet = "LD/LLN0$IntLockA";
     public static String goID = "InterlockingA";
-    public static String test = "0";
+    public static String test = "FALSE";
     public static String ndsCom = "FALSE";
     public static String protocol = "GOOSE";
 
@@ -71,6 +70,18 @@ public class GooseMessage {
 
     public double getTimestamp() {
         return timestamp;
+    }
+
+    public double getCbStatus() {
+        return cbStatus;
+    }
+
+    public int getInverseCbStatus() {
+        if (cbStatus == 1) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 
     public void setTimestamp(double timestamp) {
@@ -139,5 +150,13 @@ public class GooseMessage {
     public double getT() {
         return t;
     }
-    
+
+    public void setT(double t) {
+        this.t = t;
+    }
+
+    public GooseMessage copy() {
+        return new GooseMessage(cbStatus, stNum, sqNum, timestamp, t);
+    }
+
 }

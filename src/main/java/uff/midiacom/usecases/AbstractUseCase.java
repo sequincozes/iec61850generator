@@ -30,8 +30,8 @@ public abstract class AbstractUseCase {
     boolean printHeader = true;
     boolean defaultHeader = true;
     String attackType = "Abstract Attack";
-    String[] label = {"normal", "random_replay", "inverse_replay", "masquerade_fake_fault", "masquerade_fake_normal", "injection","poisoned_high_rate"};
-
+    String[] label = {"normal", "random_replay", "inverse_replay", "masquerade_fake_fault", "masquerade_fake_normal", "injection", "poisoned_high_rate"};
+    String columnsGOOSE[] = {"GooseTimestamp","SqNum", "StNum", "cbStatus","frameLen", "ethDst", "ethSrc", "ethType", "gooseTimeAllowedtoLive", "gooseAppid", "gooseLen", "TPID", "gocbRef", "datSet", "goID", "test", "confRev", "ndsCom", " numDatSetEntries", "APDUSize", "protocol"};      
     protected String joinColumns(ArrayList<Float[]> formatedCSVFile, ArrayList<Float[]> formatedCSVFile2, String columns[], String columns2[], int line) {
         String content = "";
         for (int i = 0; i < columns.length; i++) {
@@ -140,37 +140,46 @@ public abstract class AbstractUseCase {
         write("@attribute test {TRUE, FALSE}");
         write("@attribute confRev numeric");
         write("@attribute ndsCom {TRUE, FALSE}");
-        write("@attribute  numDatSetEntries numeric");
+        write("@attribute numDatSetEntries numeric");
         write("@attribute APDUSize numeric");
         write("@attribute protocol {SV, GOOSE}");
-        String classLine = "@attribute @class@ {" +
-              label[0] + ", "+
-              label[1] + ", "+
-              label[2] + ", "+
-              label[3] + ", "+
-              label[4] + ", "+
-              label[5] + ", "+
-              label[6] +
-              "}";
+        write("@attribute stDiff numeric");
+        write("@attribute sqDiff numeric");
+        write("@attribute gooseLenghtDiff numeric");
+        write("@attribute cbStatusDiff numeric");
+        write("@attribute apduSizeDiff numeric");
+        write("@attribute frameLenthDiff numeric");
+        write("@attribute timestampDiff numeric");
+        write("@attribute tDiff numeric");
+        String classLine = "@attribute @class@ {"
+                + label[0] + ", "
+                + label[1] + ", "
+                + label[2] + ", "
+                + label[3] + ", "
+                + label[4] + ", "
+                + label[5] + ", "
+                + label[6]
+                + "}";
 
         write(classLine);
         write("@data");
     }
-    
-    protected String getConsistencyFeaturesAsCSV(double time){
+
+    protected String getConsistencyFeaturesAsCSV(double time) {
         GooseMessage gm = gooseEventManager.getLastGooseFromSV(time);
         GooseMessage prev = gooseEventManager.getPreviousGoose(gm);
         int stDiff = gm.getStNum() - prev.getStNum();
-        int sqDiff = gm.getSqNum()- prev.getSqNum();
-        int gooseLenghtDiff = gm.getGooseLen()- prev.getGooseLen();
-        int cbStatusDiff = gm.isCbStatus()- prev.isCbStatus();
-        int apduSizeDiff = gm.getApduSize()- prev.getApduSize();
-        int frameLenthDiff = gm.getFrameLen()- prev.getFrameLen();
-        double timestampDiff = gm.getTimestamp()- prev.getTimestamp();
+        int sqDiff = gm.getSqNum() - prev.getSqNum();
+        int gooseLenghtDiff = gm.getGooseLen() - prev.getGooseLen();
+        int cbStatusDiff = gm.isCbStatus() - prev.isCbStatus();
+        int apduSizeDiff = gm.getApduSize() - prev.getApduSize();
+        int frameLenthDiff = gm.getFrameLen() - prev.getFrameLen();
+        double timestampDiff = gm.getTimestamp() - prev.getTimestamp();
         double tDiff = gm.getT() - prev.getT();
-        
-        return "," + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", " + 
-                cbStatusDiff + ", " +  apduSizeDiff + ", " + frameLenthDiff + ", " + 
-                timestampDiff + ", " + tDiff;
+
+        //ystem.out.println("Goose (st/sq/time): " + gm.getStNum() + "," + gm.getSqNum() + "," + time + ", Coisinhas:" + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", " + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", " + timestampDiff + ", " + tDiff);
+        return "," + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", "
+                + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", "
+                + timestampDiff + ", " + tDiff;
     }
 }

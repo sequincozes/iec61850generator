@@ -69,11 +69,19 @@ public final class GooseEventManager {
         }
         return lastGooseMessage;
     }
-    
+
     public GooseMessage getPreviousGoose(GooseMessage gooseMessage) {
         for (int i = 0; i < gooseMessages.size(); i++) {
             if (gooseMessage.equals(gooseMessages.get(i))) {
-                return gooseMessages.get(i-1);
+                if (i == 0) {
+                    GooseMessage pseudoPast = gooseMessages.get(0); // Pseudo past
+                    pseudoPast.setSqNum(pseudoPast.getSqNum() - 1);
+                    pseudoPast.setTimestamp(gooseMessages.get(1).getTimestamp() - (gooseMessages.get(1).getTimestamp() - pseudoPast.getTimestamp())); //Copy timestamp from next minus actual
+                    pseudoPast.setT(gooseMessages.get(1).getT() - (gooseMessages.get(1).getT() - pseudoPast.getT())); //Copy timestamp from next minus actual
+                    return pseudoPast;
+                } else {
+                    return gooseMessages.get(i - 1);
+                }
             }
         }
         return null;
@@ -105,7 +113,7 @@ public final class GooseEventManager {
                             sqNum++, // increase sqNum
                             timestamp, // current timestamp
                             t // timestamp of last st change
-                    )); 
+                    ));
                     timestamp = timestamp + interval;                               // burst mode
 
                 }

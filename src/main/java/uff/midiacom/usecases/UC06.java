@@ -29,13 +29,13 @@ public class UC06 extends AbstractUseCase{
             for (int run = 1; run < 132; run++) {
                 switch (String.valueOf(run).length()) {
                     case 1:
-                        extractor.runNormalUC0(resistence, "00" + run);
+                        extractor.runHighHateFloodingUC6(resistence, "00" + run);
                         break;
                     case 2:
-                        extractor.runNormalUC0(resistence, "0" + run);
+                        extractor.runHighHateFloodingUC6(resistence, "0" + run);
                         break;
                     default:
-                        extractor.runNormalUC0(resistence, String.valueOf(run));
+                        extractor.runHighHateFloodingUC6(resistence, String.valueOf(run));
                         break;
                 }
             }
@@ -44,7 +44,10 @@ public class UC06 extends AbstractUseCase{
         extractor.finishWriting();
     }
 
-    private void runNormalUC0(int res, String num) throws IOException {
+    /**
+     * Increases StNum at high rate
+     */
+    private void runHighHateFloodingUC6(int res, String num) throws IOException {
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};
@@ -56,68 +59,56 @@ public class UC06 extends AbstractUseCase{
 
         
         /* Generate GOOSE Part */
-        String columnsGOOSE[] = {"GooseTimestamp","SqNum", "StNum", "cbStatus","frameLen", "ethDst", "ethSrc", "ethType", "gooseTimeAllowedtoLive", "gooseAppid", "gooseLen", "TPID", "gocbRef", "datSet", "goID", "test", "confRev", "ndsCom", " numDatSetEntries", "APDUSize", "protocol"};      
         String columnsGOOSEType[] = {"numeric", "numeric", "numeric", "numeric", "numeric", "{" + GooseMessage.ethDst + "}", 
             "{" + GooseMessage.ethSrc + "}", "{" + GooseMessage.ethType + "}", "numeric", "{" + GooseMessage.gooseAppid + "}", "numeric", 
             "{" + GooseMessage.TPID + "}","{" + GooseMessage.gocbRef + "}", "{" + GooseMessage.datSet + "}", "{" + GooseMessage.goID + "}",
             "{" + GooseMessage.test + "}", "numeric", "{" + GooseMessage.ndsCom + "}", "numeric", "numeric", "{" + GooseMessage.protocol + "}"};      
-        double[] labelRange = {0.5, 0.6};
+        double[] attackRange = {0.3, 0.4};
 
        /* Write Header and Columns */
-       defaultHeader = false;
         if(printHeader){
-            if(!defaultHeader){
-                writeDefaultHeader();
-            } else {
-                write("@relation compiledtraffic");
-
-                for (String column : columns) {
-                    write("@attribute "+column+" numeric ");
-                }
-
-                for (String column : columns2) {
-                    if(!column.equals("Time"))
-                    write("@attribute "+column+" numeric ");
-                }
-
-                for (int i = 0; i < columnsGOOSE.length; i++) {
-                    write("@attribute "+columnsGOOSE[i]+" "+columnsGOOSEType[i]);
-                }
-
-                write("@attribute @class@ {" +
-                        label[0] + ", "+
-                        label[1] + ", "+
-                        label[2] + ", "+
-                        label[3] + ", "+
-                        label[4] + ", "+
-                        label[5] + ", "+
-                        label[6] +
-                "}");  
-                
-                write("@data");
-            }
+            writeDefaultHeader();
             printHeader = false;
         }
+             
+        ArrayList<GooseMessage> poisonedGooses = new ArrayList<>();
+        int stNum = 0;
+        int sqNum = 0;
+         for (int i = 0; i < formatedCSVFile2.size() - 1; i++) {
+            float time = formatedCSVFile2.get(i)[0]; 
+            if (time > attackRange[0] && time < attackRange[1]){
+                GooseMessage poisonedGoose = gooseEventManager.getLastGooseFromSV(time).copy();
+                poisonedGoose.setStNum(stNum++);
+                poisonedGoose.setSqNum(sqNum);
+                poisonedGoose.setCbStatus(poisonedGoose.getInverseCbStatus());
+                poisonedGoose.setTimestamp(time + 0.000005);
+                poisonedGoose.setT(time + 0.000005);
+                poisonedGooses.add(poisonedGoose);
+                //System.out.println("StNum >" + poisonedGoose.getStNum() + "SqNum > "+poisonedGoose.getSqNum()+", Time>"+poisonedGoose.getTimestamp());
+            } else if (time > attackRange[1]){
+                break; // Generate only messages when no fault is occuring
+            }
+        }
         
-        GooseMessage poisonedGoose = null;
-        
+        //System.out.println("0]:" + poisonedGooses.get(0).getSqNum() + "," + poisonedGooses.get(0).getSqNum());
+        //System.out.println("1]:" + poisonedGooses.get(1).getSqNum() + "," + poisonedGooses.get(1).getSqNum());
+        //System.exit(1);
+        //System.out.println(lastGooseMessage.getSqNum()+","+lastGooseMessage.getSqNum());
+
+         
+        gooseEventManager.setGooseMessages(poisonedGooses);
         
         for (int i = 0; i < formatedCSVFile2.size() - 1; i++) {
             float time = formatedCSVFile2.get(i)[0]; 
-            if (time > 500){
-                break; // Generate only messages when not fault is occuring
+            if (time > attackRange[0] && time < attackRange[1]){
+                String line = "";
+                GooseMessage currentGoose = gooseEventManager.getLastGooseFromSV(time);               
+                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," 
+                        + currentGoose.asCSVFull() + getConsistencyFeaturesAsCSV(time) + "," + label[6];           
+                write(line);
+            } else if (time > attackRange[1]){
+                break; // Generate only messages when no fault is occuring
             }
-            
-            String line = "";
-            if(poisonedGoose==null){
-                poisonedGoose = gooseEventManager.getLastGooseFromSV(time);
-            }
-            
-            poisonedGoose.setStNum(poisonedGoose.getStNum() + 1);
-            line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," 
-                    + poisonedGoose.asCSVFull() + getConsistencyFeaturesAsCSV(time) + "," + label[0];           
-            write(line);
-            
         }
 
     }
