@@ -119,7 +119,7 @@ public class UC01 extends AbstractUseCase{
             Random gooseRandom = new Random(1000);
             int gooseTime = gooseRandom.nextInt(); // random index, random SV messages
             
-            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," +gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull() +"," + label[1];
+            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," +gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull()+ getConsistencyFeaturesAsCSV(gooseTime) +"," + label[1];
 
             write(line);
         }

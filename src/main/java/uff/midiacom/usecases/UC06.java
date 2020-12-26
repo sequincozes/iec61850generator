@@ -89,13 +89,7 @@ public class UC06 extends AbstractUseCase{
                 break; // Generate only messages when no fault is occuring
             }
         }
-        
-        //System.out.println("0]:" + poisonedGooses.get(0).getSqNum() + "," + poisonedGooses.get(0).getSqNum());
-        //System.out.println("1]:" + poisonedGooses.get(1).getSqNum() + "," + poisonedGooses.get(1).getSqNum());
-        //System.exit(1);
-        //System.out.println(lastGooseMessage.getSqNum()+","+lastGooseMessage.getSqNum());
-
-         
+                
         gooseEventManager.setGooseMessages(poisonedGooses);
         
         for (int i = 0; i < formatedCSVFile2.size() - 1; i++) {
@@ -104,7 +98,7 @@ public class UC06 extends AbstractUseCase{
                 String line = "";
                 GooseMessage currentGoose = gooseEventManager.getLastGooseFromSV(time);               
                 line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," 
-                        + currentGoose.asCSVFull() + getConsistencyFeaturesAsCSV(time) + "," + label[6];           
+                        + currentGoose.asCSVFull() + getConsistencyFeaturesAsCSV(time)+ "," + label[6];           
                 write(line);
             } else if (time > attackRange[1]){
                 break; // Generate only messages when no fault is occuring

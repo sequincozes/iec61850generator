@@ -109,7 +109,7 @@ public class UC04 extends AbstractUseCase{
                 break;
             } else if (time >= writingRange[0]) {
                 if(gooseEventManager.getLastGooseFromSV(time).isCbStatus() == 0){
-                    line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," +gooseEventManager.getLastGooseFromSV(time).asCSVFull()+ "," + label[4];
+                    line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," +gooseEventManager.getLastGooseFromSV(time).asCSVFull()+ getConsistencyFeaturesAsCSV(time) + "," + label[4];
                     write(line);
                 }
             } 

@@ -122,7 +122,7 @@ public class UC03 extends AbstractUseCase{
             String line = "";
             if (time < labelRange[1]) {
                 if(gooseEventManager.getLastGooseFromSV(time).isCbStatus() > 0){
-                    line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," +gooseEventManager.getLastGooseFromSV(time).asCSVFull() + "," + label[3];
+                    line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," +gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(time) + "," + label[3];
                     write(line);
                 }
             } else {

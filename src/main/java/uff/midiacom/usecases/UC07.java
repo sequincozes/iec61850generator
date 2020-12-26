@@ -15,6 +15,8 @@ import uff.midiacom.model.GooseMessage;
  *
  * @author silvio
  */
+
+//@TODO: ESTE ATAQUE NÃO ESTÁ FINALIZADO - ERA PARA SER IGUAL AO 06 MAS COM CONSISTENCIA
 public class UC07 extends AbstractUseCase{
 
     public static void run(String filename) throws FileNotFoundException, IOException {
@@ -84,6 +86,7 @@ public class UC07 extends AbstractUseCase{
                 poisonedGoose.setTimestamp(time + 0.000005);
                 poisonedGoose.setT(time + 0.000005);
                 poisonedGooses.add(poisonedGoose);
+                //System.out.println("StNum >" + poisonedGoose.getStNum() + "SqNum > "+poisonedGoose.getSqNum()+", Time>"+poisonedGoose.getTimestamp());
             } else if (time > attackRange[1]){
                 break; // Generate only messages when no fault is occuring
             }
@@ -97,7 +100,7 @@ public class UC07 extends AbstractUseCase{
                 String line = "";
                 GooseMessage currentGoose = gooseEventManager.getLastGooseFromSV(time);               
                 line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," 
-                        + currentGoose.asCSVFull() + getConsistencyFeaturesAsCSV(time) + "," + label[6];           
+                        + currentGoose.asCSVFull() + getConsistencyFeaturesAsCSV(time) + "," + label[7];           
                 write(line);
             } else if (time > attackRange[1]){
                 break; // Generate only messages when no fault is occuring

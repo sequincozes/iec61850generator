@@ -30,8 +30,9 @@ public abstract class AbstractUseCase {
     boolean printHeader = true;
     boolean defaultHeader = true;
     String attackType = "Abstract Attack";
-    String[] label = {"normal", "random_replay", "inverse_replay", "masquerade_fake_fault", "masquerade_fake_normal", "injection", "poisoned_high_rate"};
-    String columnsGOOSE[] = {"GooseTimestamp","SqNum", "StNum", "cbStatus","frameLen", "ethDst", "ethSrc", "ethType", "gooseTimeAllowedtoLive", "gooseAppid", "gooseLen", "TPID", "gocbRef", "datSet", "goID", "test", "confRev", "ndsCom", " numDatSetEntries", "APDUSize", "protocol"};      
+    String[] label = {"normal", "random_replay", "inverse_replay", "masquerade_fake_fault", "masquerade_fake_normal", "injection", "poisoned_high_rate"};//,"poisoned_high_rate_consistent"};
+    String columnsGOOSE[] = {"GooseTimestamp", "SqNum", "StNum", "cbStatus", "frameLen", "ethDst", "ethSrc", "ethType", "gooseTimeAllowedtoLive", "gooseAppid", "gooseLen", "TPID", "gocbRef", "datSet", "goID", "test", "confRev", "ndsCom", " numDatSetEntries", "APDUSize", "protocol"};
+
     protected String joinColumns(ArrayList<Float[]> formatedCSVFile, ArrayList<Float[]> formatedCSVFile2, String columns[], String columns2[], int line) {
         String content = "";
         for (int i = 0; i < columns.length; i++) {
@@ -158,7 +159,8 @@ public abstract class AbstractUseCase {
                 + label[3] + ", "
                 + label[4] + ", "
                 + label[5] + ", "
-                + label[6]
+                + label[6] //+ ", "
+                //    + label[7]
                 + "}";
 
         write(classLine);

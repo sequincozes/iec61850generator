@@ -133,7 +133,7 @@ public class UC02 extends AbstractUseCase{
 
             int gooseTime = (int)(Math.random() * (maxGoose - minGoose + 1) + minGoose); // random GOOSE inconpatible with SV
             
-            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," +gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull() +"," + label[2];
+            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," +gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull() + getConsistencyFeaturesAsCSV(gooseTime) +"," + label[2];
 
             //System.out.println("line: "+line);
             write(line);
