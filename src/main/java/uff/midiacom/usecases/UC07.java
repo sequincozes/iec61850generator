@@ -50,6 +50,8 @@ public class UC07 extends AbstractUseCase{
      * Increases StNum at high rate + consisent 
      */
     private void runHighHateFloodingUC07(int res, String num) throws IOException {
+        restartCounters();
+        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};
@@ -100,7 +102,7 @@ public class UC07 extends AbstractUseCase{
                 String line = "";
                 GooseMessage currentGoose = gooseEventManager.getLastGooseFromSV(time);               
                 line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," 
-                        + currentGoose.asCSVFull() + getConsistencyFeaturesAsCSV(time) + "," + label[7];           
+                        + currentGoose.asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time)) + "," + label[7];
                 write(line);
             } else if (time > attackRange[1]){
                 break; // Generate only messages when no fault is occuring

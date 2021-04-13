@@ -12,26 +12,48 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+
 import uff.midiacom.goose.GooseEventManager;
 import uff.midiacom.model.GooseMessage;
 
 /**
- *
  * @author silvio
  */
 public abstract class AbstractUseCase {
 
     BufferedWriter bw;
-    static String outputLocation = "/home/silvio/datasets/Full_SV_2020/consistency_v3/";
+    static String outputLocation = "/home/silvio/datasets/Full_SV_2021/consistency_v4/";
     static String outputFile;
     GooseEventManager gooseEventManager;
-    boolean printHeader = true;
+    boolean printHeader = false;
     boolean defaultHeader = true;
     String attackType = "Abstract Attack";
     String[] label = {"normal", "random_replay", "inverse_replay", "masquerade_fake_fault", "masquerade_fake_normal", "injection", "poisoned_high_rate"};//,"poisoned_high_rate_consistent"};
     String columnsGOOSE[] = {"GooseTimestamp", "SqNum", "StNum", "cbStatus", "frameLen", "ethDst", "ethSrc", "ethType", "gooseTimeAllowedtoLive", "gooseAppid", "gooseLen", "TPID", "gocbRef", "datSet", "goID", "test", "confRev", "ndsCom", " numDatSetEntries", "APDUSize", "protocol"};
+
+    static int initialStNum;
+    static int initialSqNum;
+
+    public AbstractUseCase() {
+        initialStNum = randomBetween(0, 5000);
+        initialSqNum = randomBetween(0, 5000);
+    }
+
+
+    void restartCounters() {
+//        System.out.println("Last counters " + initialSqNum + "/" + initialStNum);
+        initialStNum = randomBetween(0, 5000);
+        initialSqNum = randomBetween(0, 5000);
+//        System.out.println("New counters " + initialSqNum + "/" + initialStNum);
+
+    }
+
+    public static int randomBetween(int min, int max) {
+        return new Random(System.nanoTime()).nextInt(max - min) + min;
+    }
 
     protected String joinColumns(ArrayList<Float[]> formatedCSVFile, ArrayList<Float[]> formatedCSVFile2, String columns[], String columns2[], int line) {
         String content = "";
@@ -55,7 +77,7 @@ public abstract class AbstractUseCase {
         ArrayList<Float[]> formatedCSVFile = new ArrayList<>();
         try {
             File myObj = new File(file);
-            try ( Scanner myReader = new Scanner(myObj)) {
+            try (Scanner myReader = new Scanner(myObj)) {
                 myReader.nextLine(); // Skip blank line
                 while (myReader.hasNextLine()) {
                     String data = myReader.nextLine();
@@ -146,10 +168,10 @@ public abstract class AbstractUseCase {
         write("@attribute protocol {SV, GOOSE}");
         write("@attribute stDiff numeric");
         write("@attribute sqDiff numeric");
-        write("@attribute gooseLenghtDiff numeric");
+        write("@attribute gooseLengthDiff numeric");
         write("@attribute cbStatusDiff numeric");
         write("@attribute apduSizeDiff numeric");
-        write("@attribute frameLenthDiff numeric");
+        write("@attribute frameLengthDiff numeric");
         write("@attribute timestampDiff numeric");
         write("@attribute tDiff numeric");
         String classLine = "@attribute @class@ {"
@@ -167,8 +189,12 @@ public abstract class AbstractUseCase {
         write("@data");
     }
 
-    protected String getConsistencyFeaturesAsCSV(double time) {
-        GooseMessage gm = gooseEventManager.getLastGooseFromSV(time);
+    protected String getConsistencyFeaturesAsCSV(GooseMessage gm) {
+
+        if (gm.getStNum() == 0) {
+            gm.setSqNum(initialSqNum);
+            gm.setStNum(initialStNum);
+        }
         GooseMessage prev = gooseEventManager.getPreviousGoose(gm);
         int stDiff = gm.getStNum() - prev.getStNum();
         int sqDiff = gm.getSqNum() - prev.getSqNum();

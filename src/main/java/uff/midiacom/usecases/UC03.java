@@ -15,35 +15,27 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+
 import uff.midiacom.goose.GooseEventManager;
 import uff.midiacom.model.GooseMessage;
 
 /**
- *
  * @author silvio
  */
-public class UC03 extends AbstractUseCase{
+public class UC03 extends AbstractUseCase {
 
-    /**
-     * Masquerade Attacks
-     * @param filename
-     * @param res - fault resistence
-     * @param num - number of run
-     * 
-     * @return masquerate goose CB open during normal operation (fake fault)
-     * @throws java.io.FileNotFoundException
-     */
-    public static void run(String filename) throws FileNotFoundException, IOException {
+
+    public static void run(String filename) throws IOException {
         outputFile = outputLocation + filename;
         UC03 extractor = new UC03();
         extractor.attackType = "masquerade_fake_fault";
         // Masquerade
         extractor.gooseEventManager = new GooseEventManager(false, 0, 0, 0, new double[]{0.3, 1.1}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
-        
+
         extractor.startWriting();
-        
+
         int[] resistences = {10, 50, 100};
-                
+
         for (int resistence : resistences) {
             for (int run = 1; run < 132; run++) {
                 switch (String.valueOf(run).length()) {
@@ -59,11 +51,24 @@ public class UC03 extends AbstractUseCase{
                 }
             }
         }
-        
+
         extractor.finishWriting();
     }
-      
+
+    /**
+     * Masquerade Attacks
+     *
+     * @param res - fault resistence
+     * @param num - number of run
+     * @return masquerate goose CB open during normal operation (fake fault)
+     * @throws java.io.FileNotFoundException
+     */
     private void generateMasqueradeAttacksUC3(int res, String num) throws IOException {
+        restartCounters();
+        // SV time range to generate a fake fault burst of GOOSE messages
+        double[][] labelRanges = {{0.0, 0.1}, {0.1, 0.2}, {0.2, 0.3}, {0.3, 0.4}, {0.4, 0.5}, {0.6, 0.7}, {0.7, 0.8}, {0.8, 0.9}, {0.9, 1.0}};
+        double[] labelRange = labelRanges[randomBetween(0, 9)];
+        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, 0, labelRange, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};
@@ -73,63 +78,71 @@ public class UC03 extends AbstractUseCase{
         String columns2[] = {"Time", "vsmB", "vsmC"};
         ArrayList<Float[]> formatedCSVFile2 = consumeFloat("/home/silvio/datasets/Full_SV_2020/resistencia" + res + "/SILVIO_r00" + num + "_02.out", 1, columns2);
 
-        
-        /* Generate GOOSE Part */
-        String columnsGOOSE[] = {"GooseTimestamp","SqNum", "StNum", "cbStatus","frameLen", "ethDst", "ethSrc", "ethType", "gooseTimeAllowedtoLive", "gooseAppid", "gooseLen", "TPID", "gocbRef", "datSet", "goID", "test", "confRev", "ndsCom", " numDatSetEntries", "APDUSize", "protocol"};      
 
-        String columnsGOOSEType[] = {"numeric", "numeric", "numeric", "numeric", "numeric", "{" + GooseMessage.ethDst + "}", 
-            "{" + GooseMessage.ethSrc +"}", "{" + GooseMessage.ethType +"}", "numeric", "{" + GooseMessage.gooseAppid + "}", "numeric", 
-            "{" + GooseMessage.TPID +"}","{" + GooseMessage.gocbRef +"}", "{"+GooseMessage.datSet + "}", "{" + GooseMessage.goID + "}",
-            "{" + GooseMessage.test +  "}", "numeric", "{" + GooseMessage.ndsCom + "}", "numeric", "numeric", "{" + GooseMessage.protocol +"}"};      
-        
-        double[] labelRange = {0.3, 0.5};
+        /* Generate GOOSE Part */
+        String columnsGOOSE[] = {"GooseTimestamp", "SqNum", "StNum", "cbStatus", "frameLen", "ethDst", "ethSrc", "ethType", "gooseTimeAllowedtoLive", "gooseAppid", "gooseLen", "TPID", "gocbRef", "datSet", "goID", "test", "confRev", "ndsCom", " numDatSetEntries", "APDUSize", "protocol"};
+
+        String columnsGOOSEType[] = {"numeric", "numeric", "numeric", "numeric", "numeric", "{" + GooseMessage.ethDst + "}",
+                "{" + GooseMessage.ethSrc + "}", "{" + GooseMessage.ethType + "}", "numeric", "{" + GooseMessage.gooseAppid + "}", "numeric",
+                "{" + GooseMessage.TPID + "}", "{" + GooseMessage.gocbRef + "}", "{" + GooseMessage.datSet + "}", "{" + GooseMessage.goID + "}",
+                "{" + GooseMessage.test + "}", "numeric", "{" + GooseMessage.ndsCom + "}", "numeric", "numeric", "{" + GooseMessage.protocol + "}"};
+
 
         /* Write Header and Columns */
-        if(printHeader){
-            if(defaultHeader){
+        if (printHeader) {
+            if (defaultHeader) {
                 writeDefaultHeader();
             } else {
-                write("@relation compiledtraffic");
-
-                for (String column : columns) {
-                    write("@attribute "+column+" numeric ");
-                }
-
-                for (String column : columns2) {
-                    if(!column.equals("Time"))
-                    write("@attribute "+column+" numeric ");
-                }
-
-                for (int i = 0; i < columnsGOOSE.length; i++) {
-                    write("@attribute "+columnsGOOSE[i]+" "+columnsGOOSEType[i]);
-                }
-
-                write("@attribute @class@ {" +
-                        label[0] + ", "+
-                        label[1] + ", "+
-                        label[2] + ", "+
-                        label[3] + ", "+
-                        label[4] + ", "+
-                        label[5] +
-                        "}");
-                write("@data");
+                writeCustomHeader(columns, columns2, columnsGOOSE, columnsGOOSEType);
             }
             printHeader = false;
         }
-        
+
+        double lastGooseTimestamp = -1;
         for (int i = 0; i < formatedCSVFile2.size() - 1; i++) {
             float time = formatedCSVFile2.get(i)[0];
             String line = "";
-            if (time < labelRange[1]) {
-                if(gooseEventManager.getLastGooseFromSV(time).isCbStatus() > 0){
-                    line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," +gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(time) + "," + label[3];
+            if (time >= labelRange[1]) {
+                break;
+            } else if (time >= labelRange[0]) {
+                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time)) + "," + label[3];
+                if (gooseEventManager.getLastGooseFromSV(time).getCbStatus() == 1) {
                     write(line);
                 }
-            } else {
-                break;
+            }
+            if (lastGooseTimestamp != gooseEventManager.getLastGooseFromSV(time).getTimestamp()) {
+                lastGooseTimestamp = gooseEventManager.getLastGooseFromSV(time).getTimestamp();
+//                System.out.println(gooseEventManager.getLastGooseFromSV(time).asCSVFull());
             }
         }
 
+    }
+
+    private void writeCustomHeader(String[] columns, String[] columns2, String[] columnsGOOSE, String[] columnsGOOSEType) throws IOException {
+        write("@relation compiledtraffic");
+
+        for (String column : columns) {
+            write("@attribute " + column + " numeric ");
+        }
+
+        for (String column : columns2) {
+            if (!column.equals("Time"))
+                write("@attribute " + column + " numeric ");
+        }
+
+        for (int i = 0; i < columnsGOOSE.length; i++) {
+            write("@attribute " + columnsGOOSE[i] + " " + columnsGOOSEType[i]);
+        }
+
+        write("@attribute @class@ {" +
+                label[0] + ", " +
+                label[1] + ", " +
+                label[2] + ", " +
+                label[3] + ", " +
+                label[4] + ", " +
+                label[5] +
+                "}");
+        write("@data");
     }
 
 

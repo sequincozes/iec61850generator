@@ -6,10 +6,11 @@
 package uff.midiacom.goose;
 
 import uff.midiacom.model.GooseMessage;
+
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
- *
  * @author silvio
  */
 public final class GooseEventManager {
@@ -39,10 +40,7 @@ public final class GooseEventManager {
         gooseMessages = generateGooseMessages();
     }
 
-    public GooseEventManager() {
-
-    }
-
+    @Deprecated
     public static void main(String[] args) {
         GooseEventManager gm = new GooseEventManager(false, 0, 0, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
         //double[] gooseLegitimateEvents = {0.01659, 0.50631, 0.5103, 0.51429, 0.53949, 0.60627, 0.61026, 0.61425, 0.63945, 0.79821};
@@ -75,7 +73,7 @@ public final class GooseEventManager {
             if (gooseMessage.equals(gooseMessages.get(i))) {
                 if (i == 0) {
                     GooseMessage pseudoPast = gooseMessages.get(0); // Pseudo past
-                    pseudoPast.setSqNum(pseudoPast.getSqNum() - 1);
+//                    pseudoPast.setSqNum(pseudoPast.getSqNum() - 1);
                     pseudoPast.setTimestamp(gooseMessages.get(1).getTimestamp() - (gooseMessages.get(1).getTimestamp() - pseudoPast.getTimestamp())); //Copy timestamp from next minus actual
                     pseudoPast.setT(gooseMessages.get(1).getT() - (gooseMessages.get(1).getT() - pseudoPast.getT())); //Copy timestamp from next minus actual
                     return pseudoPast;
@@ -121,6 +119,24 @@ public final class GooseEventManager {
         }
         return gooseMessages;
     }
+
+//    public GooseMessage generateRandomGOOSEMessage() {
+//
+//        Random random = new Random(System.currentTimeMillis());
+//
+//        Random r = new Random();
+//        int low = 0;
+//        int high = 1;
+//        int cbStatus = r.nextInt(high-low) + low;
+//
+//        return new GooseMessage(
+//                cbStatus, // random status
+//                stNum, // same stNum
+//                sqNum++, // increase sqNum
+//                timestamp, // current timestamp
+//                t // timestamp of last st change
+//        ));
+//    };
 
     public double[] exponentialBackoff(long minTime, long maxTime, double intervalMultiplier) {
         long retryIntervalMs = minTime;

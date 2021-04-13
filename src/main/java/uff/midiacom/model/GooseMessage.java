@@ -6,7 +6,6 @@
 package uff.midiacom.model;
 
 /**
- *
  * @author silvio
  */
 public class GooseMessage {
@@ -17,9 +16,9 @@ public class GooseMessage {
     private double t;                       // DYNAMICALLY GENERATED - Last Goose Change  
     private double timestamp;               // DYNAMICALLY GENERATED  
 
-    public static int gooseTimeAllowedtoLive = 11000;
-    public static int numDatSetEntries = 25;
-    public static int confRev = 1;
+    private int gooseTimeAllowedtoLive = 11000;
+    private int numDatSetEntries = 25;
+    private int confRev = 1;
 
     //public static int APDUSize = 215;     // DYNAMICALLY GENERATED  - Use getAPDUSize()
     //public static int gooseLen = 226;     // DYNAMICALLY GENERATED  - Use getgooseLen()
@@ -69,7 +68,7 @@ public class GooseMessage {
     }
 
     public double getTimestamp() {
-        return timestamp;
+        return this.timestamp;
     }
 
     public double getCbStatus() {
@@ -157,6 +156,22 @@ public class GooseMessage {
 
     public GooseMessage copy() {
         return new GooseMessage(cbStatus, stNum, sqNum, timestamp, t);
+    }
+
+    public int getGooseTimeAllowedtoLive() {
+        return gooseTimeAllowedtoLive;
+    }
+
+    public void setGooseTimeAllowedtoLive(int gooseTimeAllowedtoLive) {
+        this.gooseTimeAllowedtoLive = gooseTimeAllowedtoLive;
+    }
+
+    public int getConfRev() {
+        return confRev;
+    }
+
+    public void setConfRev(int confRev) {
+        this.confRev = confRev;
     }
 
 }
