@@ -28,7 +28,7 @@ public abstract class AbstractUseCase {
     static String outputLocation = "/home/silvio/datasets/Full_SV_2021/consistency_v4/";
     static String outputFile;
     GooseEventManager gooseEventManager;
-    boolean printHeader = false;
+    boolean printHeader = true;
     boolean defaultHeader = true;
     String attackType = "Abstract Attack";
     String[] label = {"normal", "random_replay", "inverse_replay", "masquerade_fake_fault", "masquerade_fake_normal", "injection", "poisoned_high_rate"};//,"poisoned_high_rate_consistent"};
@@ -145,6 +145,7 @@ public abstract class AbstractUseCase {
         write("@attribute vsmA numeric");
         write("@attribute vsmB numeric");
         write("@attribute vsmC numeric");
+        write("@attribute t numeric");
         write("@attribute GooseTimestamp numeric");
         write("@attribute SqNum numeric");
         write("@attribute StNum numeric");
@@ -203,7 +204,7 @@ public abstract class AbstractUseCase {
         int apduSizeDiff = gm.getApduSize() - prev.getApduSize();
         int frameLenthDiff = gm.getFrameLen() - prev.getFrameLen();
         double timestampDiff = gm.getTimestamp() - prev.getTimestamp();
-        double tDiff = gm.getT() - prev.getT();
+        double tDiff = (Double.valueOf(gm.getT()) - Double.valueOf(prev.getT()));
 
         //ystem.out.println("Goose (st/sq/time): " + gm.getStNum() + "," + gm.getSqNum() + "," + time + ", Coisinhas:" + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", " + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", " + timestampDiff + ", " + tDiff);
         return "," + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", "

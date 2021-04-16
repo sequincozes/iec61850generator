@@ -20,7 +20,6 @@ public class UC00 extends AbstractUseCase {
     public static void run(String filename) throws IOException {
         outputFile = outputLocation + filename;
         UC00 extractor = new UC00();
-        extractor.gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
         extractor.startWriting();
 
         int[] resistences = {10, 50, 100};
@@ -47,7 +46,7 @@ public class UC00 extends AbstractUseCase {
 
     private void runNormalUC00(int res, String num) throws IOException {
         restartCounters();
-        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};
@@ -57,13 +56,6 @@ public class UC00 extends AbstractUseCase {
         String columns2[] = {"Time", "vsmB", "vsmC"};
         ArrayList<Float[]> formatedCSVFile2 = consumeFloat("/home/silvio/datasets/Full_SV_2020/resistencia" + res + "/SILVIO_r00" + num + "_02.out", 1, columns2);
 
-
-        /* Generate GOOSE Part */
-        //  String columnsGOOSE[] = {"GooseTimestamp","SqNum", "StNum", "cbStatus","frameLen", "ethDst", "ethSrc", "ethType", "gooseTimeAllowedtoLive", "gooseAppid", "gooseLen", "TPID", "gocbRef", "datSet", "goID", "test", "confRev", "ndsCom", " numDatSetEntries", "APDUSize", "protocol"};
-//        String columnsGOOSEType[] = {"numeric", "numeric", "numeric", "numeric", "numeric", "{" + GooseMessage.ethDst + "}",
-//                "{" + GooseMessage.ethSrc + "}", "{" + GooseMessage.ethType + "}", "numeric", "{" + GooseMessage.gooseAppid + "}", "numeric",
-//                "{" + GooseMessage.TPID + "}", "{" + GooseMessage.gocbRef + "}", "{" + GooseMessage.datSet + "}", "{" + GooseMessage.goID + "}",
-//                "{" + GooseMessage.test + "}", "numeric", "{" + GooseMessage.ndsCom + "}", "numeric", "numeric", "{" + GooseMessage.protocol + "}"};
         double[] labelRange = {0.5, 0.6};
 
         /* Write Header and Columns */

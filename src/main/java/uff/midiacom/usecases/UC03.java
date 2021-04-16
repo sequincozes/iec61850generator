@@ -30,7 +30,7 @@ public class UC03 extends AbstractUseCase {
         UC03 extractor = new UC03();
         extractor.attackType = "masquerade_fake_fault";
         // Masquerade
-        extractor.gooseEventManager = new GooseEventManager(false, 0, 0, 0, new double[]{0.3, 1.1}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+//        extractor.gooseEventManager = new GooseEventManager(false, 0, 0, new double[]{0.3, 1.1}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
 
         extractor.startWriting();
 
@@ -68,7 +68,7 @@ public class UC03 extends AbstractUseCase {
         // SV time range to generate a fake fault burst of GOOSE messages
         double[][] labelRanges = {{0.0, 0.1}, {0.1, 0.2}, {0.2, 0.3}, {0.3, 0.4}, {0.4, 0.5}, {0.6, 0.7}, {0.7, 0.8}, {0.8, 0.9}, {0.9, 1.0}};
         double[] labelRange = labelRanges[randomBetween(0, 9)];
-        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, 0, labelRange, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum,  labelRange, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};

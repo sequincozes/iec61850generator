@@ -24,7 +24,7 @@ public class UC02 extends AbstractUseCase {
         outputFile = outputLocation + filename;
         UC02 extractor = new UC02();
         extractor.attackType = "inverse_replay";
-        extractor.gooseEventManager = new GooseEventManager(false, 0, 0, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+//        extractor.gooseEventManager = new GooseEventManager(false, 0, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
         extractor.startWriting();
 
         int[] resistences = {10, 50, 100};
@@ -61,7 +61,7 @@ public class UC02 extends AbstractUseCase {
      */
     private void generateReplayAttacksUC2(int res, String num, int numReplayInstances) throws IOException {
         restartCounters();
-        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};

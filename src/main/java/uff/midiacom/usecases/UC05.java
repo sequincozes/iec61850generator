@@ -21,12 +21,11 @@ public class UC05 extends AbstractUseCase {
 
     //Injection
     public static void run(String filename) throws FileNotFoundException, IOException {
-        System.out.println("Run: " + filename);
         outputFile = outputLocation + filename;
         UC05 extractor = new UC05();
         extractor.attackType = "injection";
 
-        extractor.gooseEventManager = new GooseEventManager(false, 0, 0, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+//        extractor.gooseEventManager = new GooseEventManager(false,  0, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
 
         extractor.startWriting();
 
@@ -63,7 +62,7 @@ public class UC05 extends AbstractUseCase {
      */
     private void generateInjectionAttacksUC5(int res, String num, int numInjectionAttacks) throws IOException {
         restartCounters();
-        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};

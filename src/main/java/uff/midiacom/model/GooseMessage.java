@@ -116,7 +116,7 @@ public class GooseMessage {
     }
 
     public String asCSVFull() {
-        return getTimestamp() + "," + getSqNum() + "," + getStNum() + "," + cbStatus + ", " + getFrameLen()
+        return getT() + "," + getTimestamp() + "," + getSqNum() + "," + getStNum() + "," + cbStatus + ", " + getFrameLen()
                 + ", " + ethDst + ", " + ethSrc + ", " + ethType + ", " + gooseTimeAllowedtoLive + ", " + gooseAppid
                 + ", " + getGooseLen() + ", " + TPID + ", " + gocbRef + ", " + datSet
                 + ", " + goID + ", " + test + ", " + confRev + ", " + ndsCom

@@ -20,13 +20,12 @@ public class UC01 extends AbstractUseCase {
 
 
     // Replay random
-
     public static void run(String filename) throws FileNotFoundException, IOException {
         outputFile = outputLocation + filename;
         UC01 extractor = new UC01();
         extractor.attackType = "random_replay";
 
-        extractor.gooseEventManager = new GooseEventManager(false, 0, 0, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+//        extractor.gooseEventManager = new GooseEventManager(false, 0,  0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
 
         extractor.startWriting();
 
@@ -53,7 +52,6 @@ public class UC01 extends AbstractUseCase {
         extractor.finishWriting();
     }
 
-
     /**
      * @param res                - fault resistence
      * @param num                - number of run
@@ -63,7 +61,7 @@ public class UC01 extends AbstractUseCase {
      */
     private void generateReplayAttacksUC1(int res, String num, int numReplayInstances) throws IOException {
         restartCounters();
-        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, 0, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};
