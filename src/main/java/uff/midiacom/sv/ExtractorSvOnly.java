@@ -5,12 +5,12 @@
  */
 package uff.midiacom.sv;
 
-import java.io.BufferedReader;
+import uff.midiacom.usecases.AbstractUseCase;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -56,8 +56,12 @@ public class ExtractorSvOnly {
 
         /* Extract First Part */
         String columns[] = {"Col1", "Col2", "Col3", "Col4", "Col5", "Col6", "Col7", "Col8", "Col9", "Col10", "Col11"};
-        ArrayList<Float[]> formatedCSVFile = consumeFloat("/home/silvio/datasets/Full_SV_2020/resistencia" + res + "/SILVIO_r00" + num + "_01.out", 1, columns);
-
+        ArrayList<Float[]> formatedCSVFile;
+        if(AbstractUseCase.USE_OFFSET) {
+            formatedCSVFile = consumeFloat("/home/silvio/datasets/Full_SV_2020/resistencia" + res + "/SILVIO_r00" + num + "_01.out", 1, columns);
+        } else {
+            formatedCSVFile = consumeFloat("/home/silvio/datasets/Full_SV_2020/resistencia" + res + "/SILVIO_r00" + num + "_01.out", 1, columns);
+        }
         /* Extract Second Part */
         String columns2[] = {"Col12", "Col13", "Col14"};
         ArrayList<Float[]> formatedCSVFile2 = consumeFloat("/home/silvio/datasets/Full_SV_2020/resistencia" + res + "/SILVIO_r00" + num + "_02.out", 1, columns2);

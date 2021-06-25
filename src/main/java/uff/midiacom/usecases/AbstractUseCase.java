@@ -23,12 +23,15 @@ import uff.midiacom.model.GooseMessage;
  * @author silvio
  */
 public abstract class AbstractUseCase {
-
+    public static boolean USE_OFFSET = true;
+    static float offset;
+    public static int runs = 132;
+    public static boolean generateSingleRound = false;
     BufferedWriter bw;
-    static String outputLocation = "/home/silvio/datasets/Full_SV_2021/consistency_v4/";
+    public static String outputLocation = "/home/silvio/datasets/Full_SV_2021/consistency_v5/";
     static String outputFile;
     GooseEventManager gooseEventManager;
-    boolean printHeader = true;
+    public static boolean printHeader = false;
     boolean defaultHeader = true;
     String attackType = "Abstract Attack";
     String[] label = {"normal", "random_replay", "inverse_replay", "masquerade_fake_fault", "masquerade_fake_normal", "injection", "poisoned_high_rate"};//,"poisoned_high_rate_consistent"};
@@ -36,19 +39,38 @@ public abstract class AbstractUseCase {
 
     static int initialStNum;
     static int initialSqNum;
+    public static boolean replace = true;
 
     public AbstractUseCase() {
         initialStNum = randomBetween(0, 5000);
         initialSqNum = randomBetween(0, 5000);
+        if (USE_OFFSET) {
+            offset = randomBetween(0, 5000); // offset
+        } else {
+            offset = 0;
+        }
     }
 
-
-    void restartCounters() {
+    float restartCounters() {
 //        System.out.println("Last counters " + initialSqNum + "/" + initialStNum);
         initialStNum = randomBetween(0, 5000);
         initialSqNum = randomBetween(0, 5000);
 //        System.out.println("New counters " + initialSqNum + "/" + initialStNum);
+        if (USE_OFFSET) {
+            offset = randomBetween(0, 5000); // offset
+        } else {
+            offset = 0;
+        }
+        return offset;
+    }
 
+    float defineCounters(int initialStNum, int initialSqNum, float offset) {
+//        System.out.println("Last counters " + initialSqNum + "/" + initialStNum);
+        this.initialStNum = initialStNum;
+        this.initialSqNum = initialSqNum;
+//        System.out.println("New counters " + initialSqNum + "/" + initialStNum);
+        this.offset = offset;
+        return offset;
     }
 
     public static int randomBetween(int min, int max) {
@@ -73,7 +95,30 @@ public abstract class AbstractUseCase {
         return content;
     }
 
+    protected String joinColumns(ArrayList<Float[]> formatedCSVFile, double timeGambi, ArrayList<Float[]> formatedCSVFile2, String columns[], String columns2[], int line) {
+        String content = "";
+        for (int i = 0; i < columns.length; i++) {
+            float value = formatedCSVFile.get(line)[i];
+            if (i == 0) {
+                content = content.concat(value + timeGambi + ",");
+            } else {
+                content = content.concat(value + ",");
+            }
+        }
+
+        for (int i = 1; i < columns2.length; i++) {
+            float value = formatedCSVFile2.get(line)[i];
+            if (columns2.length - 1 == i) {
+                content = content.concat(String.valueOf(value));
+            } else {
+                content = content.concat(value + ",");
+            }
+        }
+        return content;
+    }
+
     protected ArrayList<Float[]> consumeFloat(String file, int scale, String columns[]) {
+//        int offset = randomBetween(0,1000);
         ArrayList<Float[]> formatedCSVFile = new ArrayList<>();
         try {
             File myObj = new File(file);
@@ -99,9 +144,14 @@ public abstract class AbstractUseCase {
                             t++;
                             String next = stringTokenizer.nextToken();
                             if (!next.contains(",")) {
-                                float token = Float.valueOf(next) * scale;
+                                float feature = Float.valueOf(next) * scale;
                                 int column = ((t + 1) / 2) - 1;
-                                tokenLine[column] = token;
+                                if (USE_OFFSET) {
+                                    if (columns[column].equalsIgnoreCase("Time")) {
+                                        feature = feature + offset;
+                                    }
+                                }
+                                tokenLine[column] = feature;
                             }
                         }
                         formatedCSVFile.add(tokenLine);
@@ -122,7 +172,7 @@ public abstract class AbstractUseCase {
 
     protected void startWriting() throws FileNotFoundException, IOException {
         File fout = new File(outputFile);
-        FileOutputStream fos = new FileOutputStream(fout);
+        FileOutputStream fos = new FileOutputStream(fout, !replace);
         bw = new BufferedWriter(new OutputStreamWriter(fos));
     }
 
@@ -132,49 +182,50 @@ public abstract class AbstractUseCase {
 
     protected void writeDefaultHeader() throws IOException {
         write("@relation compiledtraffic");
-        write("@attribute Time numeric");
-        write("@attribute isbA numeric");
-        write("@attribute isbB numeric");
-        write("@attribute isbC numeric");
-        write("@attribute ismA numeric");
-        write("@attribute ismB numeric");
-        write("@attribute ismC numeric");
-        write("@attribute vsbA numeric");
-        write("@attribute vsbB numeric");
-        write("@attribute vsbC numeric");
-        write("@attribute vsmA numeric");
-        write("@attribute vsmB numeric");
-        write("@attribute vsmC numeric");
-        write("@attribute t numeric");
-        write("@attribute GooseTimestamp numeric");
-        write("@attribute SqNum numeric");
-        write("@attribute StNum numeric");
-        write("@attribute cbStatus numeric");
-        write("@attribute frameLen numeric");
-        write("@attribute ethDst {01:a0:f4:08:2f:77, FF:FF:FF:FF:FF:FF}");
-        write("@attribute ethSrc {FF:FF:FF:FF:FF:FF, 00:a0:f4:08:2f:77}");
-        write("@attribute ethType {0x000077b7, 0x000088b8}");
-        write("@attribute gooseTimeAllowedtoLive numeric");
-        write("@attribute gooseAppid {0x00003002, 0x00003001}");
-        write("@attribute gooseLen numeric");
-        write("@attribute TPID {0x7101, 0x8100}");
-        write("@attribute gocbRef {LD/LLN0$IntLockB, LD/LLN0$GO$gcbA}");
-        write("@attribute datSet {LD/LLN0$IntLockA, AA1C1Q01A1LD0/LLN0$InterlockingC}");
-        write("@attribute goID {InterlockingF, InterlockingA}");
-        write("@attribute test {TRUE, FALSE}");
-        write("@attribute confRev numeric");
-        write("@attribute ndsCom {TRUE, FALSE}");
-        write("@attribute numDatSetEntries numeric");
-        write("@attribute APDUSize numeric");
-        write("@attribute protocol {SV, GOOSE}");
-        write("@attribute stDiff numeric");
-        write("@attribute sqDiff numeric");
-        write("@attribute gooseLengthDiff numeric");
-        write("@attribute cbStatusDiff numeric");
-        write("@attribute apduSizeDiff numeric");
-        write("@attribute frameLengthDiff numeric");
-        write("@attribute timestampDiff numeric");
-        write("@attribute tDiff numeric");
+        write("@attribute Time numeric");// time-based 1
+        write("@attribute isbA numeric"); //SV-related 2
+        write("@attribute isbB numeric"); //SV-related 3
+        write("@attribute isbC numeric"); //SV-related 4
+        write("@attribute ismA numeric"); //SV-related 5
+        write("@attribute ismB numeric"); //SV-related 6
+        write("@attribute ismC numeric"); //SV-related 7
+        write("@attribute vsbA numeric"); //SV-related 8
+        write("@attribute vsbB numeric"); //SV-related 9
+        write("@attribute vsbC numeric"); //SV-related 10
+        write("@attribute vsmA numeric"); //SV-related 11
+        write("@attribute vsmB numeric"); //SV-related 12
+        write("@attribute vsmC numeric"); //SV-related 13
+        write("@attribute t numeric"); // time-based  14
+        write("@attribute GooseTimestamp numeric"); // time-based 15
+        write("@attribute SqNum numeric"); // Status-based 16
+        write("@attribute StNum numeric"); // Status-based 17
+        write("@attribute cbStatus numeric"); // Status-based 18
+        write("@attribute frameLen numeric"); //network-based 19
+        write("@attribute ethDst {01:a0:f4:08:2f:77, FF:FF:FF:FF:FF:FF}"); //network-based 20
+        write("@attribute ethSrc {FF:FF:FF:FF:FF:FF, 00:a0:f4:08:2f:77}"); //network-based 21
+        write("@attribute ethType {0x000077b7, 0x000088b8}"); //network-based 22
+        write("@attribute gooseTimeAllowedtoLive numeric"); //IED-based 23
+        write("@attribute gooseAppid {0x00003002, 0x00003001}");  //IED-based 24
+        write("@attribute gooseLen numeric");  //IED-based 25
+        write("@attribute TPID {0x7101, 0x8100}");  //IED-based 26
+        write("@attribute gocbRef {LD/LLN0$IntLockB, LD/LLN0$GO$gcbA}");  //IED-based 27
+        write("@attribute datSet {LD/LLN0$IntLockA, AA1C1Q01A1LD0/LLN0$InterlockingC}");  //IED-based 28
+        write("@attribute goID {InterlockingF, InterlockingA}");  //IED-based 29
+        write("@attribute test {TRUE, FALSE}");  //IED-based 30
+        write("@attribute confRev numeric");  //IED-based 31
+        write("@attribute ndsCom {TRUE, FALSE}");  //IED-based 32
+        write("@attribute numDatSetEntries numeric");  //IED-based 33
+        write("@attribute APDUSize numeric"); //network-based 34
+        write("@attribute protocol {SV, GOOSE}"); //network-based 35
+        write("@attribute stDiff numeric"); // temporal consistency 36
+        write("@attribute sqDiff numeric"); // temporal consistency 37
+        write("@attribute gooseLengthDiff numeric"); // temporal consistency 38
+        write("@attribute cbStatusDiff numeric"); // temporal consistency 39
+        write("@attribute apduSizeDiff numeric"); // temporal consistency 40
+        write("@attribute frameLengthDiff numeric"); // temporal consistency 41
+        write("@attribute timestampDiff numeric"); // temporal consistency 42
+        write("@attribute tDiff numeric"); // temporal consistency 43
+        write("@attribute timeFromLastChange numeric"); // temporal consistency 44
         String classLine = "@attribute @class@ {"
                 + label[0] + ", "
                 + label[1] + ", "
@@ -209,6 +260,28 @@ public abstract class AbstractUseCase {
         //ystem.out.println("Goose (st/sq/time): " + gm.getStNum() + "," + gm.getSqNum() + "," + time + ", Coisinhas:" + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", " + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", " + timestampDiff + ", " + tDiff);
         return "," + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", "
                 + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", "
-                + timestampDiff + ", " + tDiff;
+                + timestampDiff + ", " + tDiff  +", " + ( gm.getTimestamp()- gm.getT());
+    }
+
+    protected String getConsistencyFeaturesAsCSV(GooseMessage curent, GooseMessage previous) {
+
+        if (curent.getStNum() == 0) {
+            curent.setSqNum(initialSqNum);
+            curent.setStNum(initialStNum);
+        }
+        int stDiff = curent.getStNum() - previous.getStNum();
+        int sqDiff = curent.getSqNum() - previous.getSqNum();
+        int gooseLenghtDiff = curent.getGooseLen() - previous.getGooseLen();
+        int cbStatusDiff = curent.isCbStatus() - previous.isCbStatus();
+        int apduSizeDiff = curent.getApduSize() - previous.getApduSize();
+        int frameLenthDiff = curent.getFrameLen() - previous.getFrameLen();
+        double timestampDiff = curent.getTimestamp() - previous.getTimestamp();
+        double tDiff = (Double.valueOf(curent.getT()) - Double.valueOf(previous.getT()));
+        double timeFromLastChange = curent.getTimestamp() - curent.getT();
+
+        //ystem.out.println("Goose (st/sq/time): " + gm.getStNum() + "," + gm.getSqNum() + "," + time + ", Coisinhas:" + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", " + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", " + timestampDiff + ", " + tDiff);
+        return "," + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", "
+                + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", "
+                + timestampDiff + ", " + tDiff + ", " + timeFromLastChange;
     }
 }

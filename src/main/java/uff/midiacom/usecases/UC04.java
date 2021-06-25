@@ -8,6 +8,7 @@ package uff.midiacom.usecases;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import uff.midiacom.goose.GooseEventManager;
 import uff.midiacom.model.GooseMessage;
 
@@ -20,7 +21,9 @@ public class UC04 extends AbstractUseCase {
     public static void run(String filename) throws IOException {
         outputFile = outputLocation + filename;
         UC04 extractor = new UC04();
+        System.out.println(outputFile);
         extractor.attackType = "masquerade_fake_fault";
+
         // Masquerade
 //        extractor.gooseEventManager = new GooseEventManager(false, 0, 0, new double[]{0.3, 1.1}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
 
@@ -29,7 +32,7 @@ public class UC04 extends AbstractUseCase {
         int[] resistences = {10, 50, 100};
 
         for (int resistence : resistences) {
-            for (int run = 1; run < 132; run++) {
+            for (int run = 1; run < AbstractUseCase.runs; run++) {
                 switch (String.valueOf(run).length()) {
                     case 1:
                         extractor.generateMasqueradeAttacksUC4(resistence, "00" + run);
@@ -58,8 +61,8 @@ public class UC04 extends AbstractUseCase {
     private void generateMasqueradeAttacksUC4(int res, String num) throws IOException {
         restartCounters();
         // SV time range to generate a fake fault burst of GOOSE messages
-        double[] labelRange = {0.5, 0.6};
-        gooseEventManager = new GooseEventManager(true, initialStNum, initialSqNum,  labelRange, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+        double[] labelRange = {offset+0.5, offset+0.6};
+        gooseEventManager = new GooseEventManager(true, initialStNum, initialSqNum, labelRange, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};
@@ -100,6 +103,9 @@ public class UC04 extends AbstractUseCase {
                 if (gooseEventManager.getLastGooseFromSV(time).getCbStatus() == 0) {
                     write(line);
                 }
+            } else if (time >= (labelRange[0] - 0.1) && time < labelRange[0]) { // write some normals to avoid errors of single class bla bla
+                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time)) + "," + label[3];
+                write(line);
             }
             if (lastGooseTimestamp != gooseEventManager.getLastGooseFromSV(time).getTimestamp()) {
                 lastGooseTimestamp = gooseEventManager.getLastGooseFromSV(time).getTimestamp();

@@ -26,7 +26,7 @@ public class UC07 extends AbstractUseCase {
         int[] resistences = {10, 50, 100};
 
         for (int resistence : resistences) {
-            for (int run = 1; run < 132; run++) {
+            for (int run = 1; run < AbstractUseCase.runs; run++) {
                 switch (String.valueOf(run).length()) {
                     case 1:
                         extractor.runHighHateFloodingUC6(resistence, "00" + run);
@@ -49,7 +49,7 @@ public class UC07 extends AbstractUseCase {
      */
     private void runHighHateFloodingUC6(int res, String num) throws IOException {
         restartCounters();
-        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum,  new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum,  new double[]{offset+0.5, offset+0.6}, 0.00631, offset+0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};
@@ -65,7 +65,7 @@ public class UC07 extends AbstractUseCase {
                 "{" + GooseMessage.ethSrc + "}", "{" + GooseMessage.ethType + "}", "numeric", "{" + GooseMessage.gooseAppid + "}", "numeric",
                 "{" + GooseMessage.TPID + "}", "{" + GooseMessage.gocbRef + "}", "{" + GooseMessage.datSet + "}", "{" + GooseMessage.goID + "}",
                 "{" + GooseMessage.test + "}", "numeric", "{" + GooseMessage.ndsCom + "}", "numeric", "numeric", "{" + GooseMessage.protocol + "}"};
-        double[] attackRange = {0.3, 0.4};
+        double[] attackRange = {offset+0.3, offset+0.4};
 
         /* Write Header and Columns */
         if (printHeader) {

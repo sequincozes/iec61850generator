@@ -6,8 +6,10 @@
 package uff.midiacom.goose;
 
 import uff.midiacom.model.GooseMessage;
+import uff.midiacom.usecases.UseCases;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * @author silvio
@@ -40,6 +42,19 @@ public final class GooseEventManager {
         gooseMessages = generateGooseMessages();
     }
 
+    public GooseEventManager(boolean cbStatus, int stNum, int sqNum, double currentTimestamp, double delayFromEvent, double firstGoose, double initialBackoffInterval, long minTime, long maxTime) {
+        this.initialCbStatus = cbStatus;
+        this.initialStNum = stNum;
+        this.minTime = minTime;
+        this.maxTime = maxTime;
+        this.initialSqNum = sqNum;
+        this.tIntervals = exponentialBackoff(minTime, maxTime, initialBackoffInterval);
+        this.eventsTimestamp = new double[]{};
+        this.delayFromEvent = delayFromEvent;
+        this.firstGooseTime = firstGoose;
+        gooseMessages = generateGooseMessages(currentTimestamp);
+    }
+
     public GooseMessage getLastGooseFromSV(double timestamp) {
         GooseMessage lastGooseMessage = gooseMessages.get(0);
         for (GooseMessage gooseMessage : gooseMessages) {
@@ -59,7 +74,7 @@ public final class GooseEventManager {
                     pseudoPast = gooseMessages.get(0).copy(); // Pseudo past
                     double pseudoPastTimestamp = gooseMessages.get(0).getTimestamp() - maxTime;
                     pseudoPast.setTimestamp(pseudoPastTimestamp); //Assume the last message wast sent at now - maxtime
-                    pseudoPast.setSqNum(pseudoPast.getSqNum()-1);
+                    pseudoPast.setSqNum(pseudoPast.getSqNum() - 1);
                     return pseudoPast;
                 } else {
                     return gooseMessages.get(i - 1);
@@ -78,6 +93,7 @@ public final class GooseEventManager {
         boolean cbStatus = isInitialCbStatus();
         GooseMessage periodicGoose = new GooseMessage(toInt(cbStatus), stNum, sqNum, getFirstGooseTime(), getFirstGooseTime());
         this.gooseMessages.add(periodicGoose);              // periodic message
+
         if (debug) {
             System.out.println(getPreviousGoose(periodicGoose).asCSVFull());
             System.out.println(periodicGoose.asCSVFull());
@@ -108,7 +124,6 @@ public final class GooseEventManager {
                     }
                     this.gooseMessages.add(gm);
                     timestamp = timestamp + interval;                               // burst mode
-
                 }
             }
         }
@@ -117,6 +132,100 @@ public final class GooseEventManager {
         }
         return this.gooseMessages;
     }
+
+    public ArrayList<GooseMessage> generateGooseMessages(double currentTimestamp) {
+        this.gooseMessages = new ArrayList<>();
+        int stNum = getInitialStNum();
+        int sqNum = getInitialSqNum();
+        boolean cbStatus = isInitialCbStatus();
+        GooseMessage periodicGoose = new GooseMessage(toInt(cbStatus), stNum, sqNum, currentTimestamp, getFirstGooseTime());
+        this.gooseMessages.add(periodicGoose);              // periodic message
+
+        if (debug) {
+            System.out.println(getPreviousGoose(periodicGoose).asCSVFull());
+            System.out.println(periodicGoose.asCSVFull());
+        }
+
+        for (double eventTimestamp : getEventsTimestamp()) {
+            // Status change
+            cbStatus = !cbStatus;
+            stNum = stNum + 1;
+            sqNum = 1;
+            double timestamp = getDelayFromEvent() + eventTimestamp;
+            double t = timestamp; // new t
+
+//            System.out.println(t);
+            for (double interval : gettIntervals()) { // GOOSE BURST MODE
+                if (eventTimestamp == getEventsTimestamp()[0] && interval >= getEventsTimestamp()[1]) {
+                    break;
+                } else {
+                    GooseMessage gm = new GooseMessage(
+                            toInt(cbStatus), // current status
+                            stNum, // same stNum
+                            sqNum++, // increase sqNum
+                            timestamp, // current timestamp
+                            t // timestamp of last st change
+                    );
+                    if (debug) {
+                        System.out.println(gm.asCSVFull());
+                    }
+                    this.gooseMessages.add(gm);
+                    timestamp = timestamp + interval;                               // burst mode
+                }
+            }
+        }
+        if (debug) {
+            System.exit(0);
+        }
+        return this.gooseMessages;
+    }
+    //@Deprecated
+//    public ArrayList<GooseMessage> generateGooseMessagesForUC01() {
+//        this.gooseMessages = new ArrayList<>();
+//        int stNum = getInitialStNum();
+//        int sqNum = getInitialSqNum();
+//        boolean cbStatus = isInitialCbStatus();
+//        GooseMessage periodicGoose = new GooseMessage(toInt(cbStatus), stNum, sqNum, getFirstGooseTime(), getFirstGooseTime());
+//        this.gooseMessages.add(periodicGoose);              // periodic message
+//        if (debug) {
+//            System.out.println(getPreviousGoose(periodicGoose).asCSVFull());
+//            System.out.println(periodicGoose.asCSVFull());
+//        }
+//
+//        for (double eventTimestamp : getEventsTimestamp()) {
+//            // Status change
+//            cbStatus = !cbStatus;
+//            stNum = stNum + 1;
+//            sqNum = 1;
+//            double timestamp = getDelayFromEvent() + eventTimestamp;
+//            double t = timestamp; // new t
+//
+////            System.out.println(t);
+//            for (double interval : gettIntervals()) { // GOOSE BURST MODE
+//                if (eventTimestamp == getEventsTimestamp()[0] && interval >= getEventsTimestamp()[1]) {
+//                    break;
+//                } else {
+//                    GooseMessage gm = new GooseMessage(
+//                            toInt(cbStatus), // current status
+//                            stNum, // same stNum
+//                            sqNum++, // increase sqNum
+//                            timestamp, // current timestamp
+//                            t // timestamp of last st change
+//                    );
+//                    if (debug) {
+//                        System.out.println(gm.asCSVFull());
+//                    }
+//                    this.gooseMessages.add(gm);
+//                    timestamp = timestamp + interval;                               // burst mode
+//
+//                }
+//            }
+//        }
+//        if (debug) {
+//            System.exit(0);
+//        }
+//        return this.gooseMessages;
+//    }
 
     public double[] exponentialBackoff(long minTime, long maxTime, double intervalMultiplier) {
         long retryIntervalMs = minTime;
@@ -144,6 +253,32 @@ public final class GooseEventManager {
         return arrayIntervals;
     }
 
+    public double[] exponentialBackoffForUC01(long minTime, long maxTime, double intervalMultiplier) {
+        long retryIntervalMs = minTime;
+
+        ArrayList<Double> tIntervals = new ArrayList<>();
+        do {
+            tIntervals.add(retryIntervalMs / 1000.0);
+            retryIntervalMs *= intervalMultiplier;
+            if (retryIntervalMs > maxTime) {
+                intervalMultiplier = intervalMultiplier + 0.001;
+                retryIntervalMs = minTime;
+            } else if (retryIntervalMs == maxTime) {
+                tIntervals.add(retryIntervalMs / 1000.0);
+                break;
+            }
+
+        } while (retryIntervalMs <= maxTime);
+
+        int i = 0;
+        double[] arrayIntervals = new double[tIntervals.size() + 1];
+        arrayIntervals[i++] = tIntervals.get(0); // first two retransmission are on same period
+        for (double ti : tIntervals) {
+            arrayIntervals[i++] = ti;
+        }
+
+        return arrayIntervals;
+    }
     public int getInitialStNum() {
         return initialStNum;
     }
@@ -239,6 +374,11 @@ public final class GooseEventManager {
             return 1;
         }
 
+    }
+
+    private long getRandomTime(){
+        Random gooseRandom = new Random(System.nanoTime());
+        return gooseRandom.nextInt(1000); // random index, random SV messages
     }
 
 }

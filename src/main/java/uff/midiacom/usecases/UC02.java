@@ -32,7 +32,7 @@ public class UC02 extends AbstractUseCase {
         int numReplayInstances = 1000; // 1000 attacks per scenario
 
         for (int resistence : resistences) {
-            for (int run = 1; run < 132; run++) {
+            for (int run = 1; run < AbstractUseCase.runs; run++) {
                 switch (String.valueOf(run).length()) {
                     case 1:
                         extractor.generateReplayAttacksUC2(resistence, "00" + run, numReplayInstances);
@@ -61,7 +61,7 @@ public class UC02 extends AbstractUseCase {
      */
     private void generateReplayAttacksUC2(int res, String num, int numReplayInstances) throws IOException {
         restartCounters();
-        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, new double[]{0.5, 0.6}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, new double[]{offset+0.5, offset+0.6}, 0.00631, offset + 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};

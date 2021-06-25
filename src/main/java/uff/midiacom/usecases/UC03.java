@@ -37,7 +37,7 @@ public class UC03 extends AbstractUseCase {
         int[] resistences = {10, 50, 100};
 
         for (int resistence : resistences) {
-            for (int run = 1; run < 132; run++) {
+            for (int run = 1; run < AbstractUseCase.runs; run++) {
                 switch (String.valueOf(run).length()) {
                     case 1:
                         extractor.generateMasqueradeAttacksUC3(resistence, "00" + run);
@@ -66,9 +66,9 @@ public class UC03 extends AbstractUseCase {
     private void generateMasqueradeAttacksUC3(int res, String num) throws IOException {
         restartCounters();
         // SV time range to generate a fake fault burst of GOOSE messages
-        double[][] labelRanges = {{0.0, 0.1}, {0.1, 0.2}, {0.2, 0.3}, {0.3, 0.4}, {0.4, 0.5}, {0.6, 0.7}, {0.7, 0.8}, {0.8, 0.9}, {0.9, 1.0}};
+        double[][] labelRanges = {{offset+0.0, offset+0.1}, {offset+0.1, offset+0.2}, {offset+0.2, offset+0.3}, {offset+0.3, offset+0.4}, {offset+0.4, offset+0.5}, {offset+0.6, offset+0.7}, {offset+0.7, offset+0.8}, {offset+0.8, offset+0.9}, {offset+0.9, offset+1.0}};
         double[] labelRange = labelRanges[randomBetween(0, 9)];
-        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum,  labelRange, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum,  labelRange, 0.00631, offset + 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};
