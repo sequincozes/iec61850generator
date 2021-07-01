@@ -34,7 +34,7 @@ public abstract class AbstractUseCase {
     public static boolean printHeader = false;
     boolean defaultHeader = true;
     String attackType = "Abstract Attack";
-    String[] label = {"normal", "random_replay", "inverse_replay", "masquerade_fake_fault", "masquerade_fake_normal", "injection", "poisoned_high_rate"};//,"poisoned_high_rate_consistent"};
+    String[] label = {"normal", "random_replay", "inverse_replay", "masquerade_fake_fault", "masquerade_fake_normal", "injection","high_StNum", "poisoned_high_rate"};//,"poisoned_high_rate_consistent"};
     String columnsGOOSE[] = {"GooseTimestamp", "SqNum", "StNum", "cbStatus", "frameLen", "ethDst", "ethSrc", "ethType", "gooseTimeAllowedtoLive", "gooseAppid", "gooseLen", "TPID", "gocbRef", "datSet", "goID", "test", "confRev", "ndsCom", " numDatSetEntries", "APDUSize", "protocol"};
 
     static int initialStNum;
@@ -195,6 +195,10 @@ public abstract class AbstractUseCase {
         write("@attribute vsmA numeric"); //SV-related 11
         write("@attribute vsmB numeric"); //SV-related 12
         write("@attribute vsmC numeric"); //SV-related 13
+
+        write("@attribute isbATrapArea numeric"); //SV-related 2
+        write("@attribute isbATrapAreaSum numeric"); //SV-related 2
+
         write("@attribute t numeric"); // time-based  14
         write("@attribute GooseTimestamp numeric"); // time-based 15
         write("@attribute SqNum numeric"); // Status-based 16
@@ -283,5 +287,20 @@ public abstract class AbstractUseCase {
         return "," + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", "
                 + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", "
                 + timestampDiff + ", " + tDiff + ", " + timeFromLastChange;
+    }
+
+    public static double getTrapezioArea(double x0, double x1, double fx0, double fx1) {
+        double trap;
+        trap = (fx1 + fx0) * (x1 - x0) / 2.00;
+        System.out.println(trap);
+        return trap;
+    }
+
+    public static double getSumTrapezioArea(double[] v) {
+        double areat = 0;
+        for (int i = 0; i < v.length; i++) {
+            areat = areat + v[i];
+        }
+        return areat;
     }
 }

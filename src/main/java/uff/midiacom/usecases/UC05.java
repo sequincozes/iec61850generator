@@ -34,7 +34,7 @@ public class UC05 extends AbstractUseCase {
         int numReplayInstances = 1000; // 1000 attacks per scenario
 
         for (int resistence : resistences) {
-            for (int run = 1; run < AbstractUseCase.runs; run++) {
+            for (int run = 1; run <= AbstractUseCase.runs; run++) {
                 switch (String.valueOf(run).length()) {
                     case 1:
                         extractor.generateInjectionAttacksUC5(resistence, "00" + run, numReplayInstances);

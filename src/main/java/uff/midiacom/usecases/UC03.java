@@ -37,7 +37,7 @@ public class UC03 extends AbstractUseCase {
         int[] resistences = {10, 50, 100};
 
         for (int resistence : resistences) {
-            for (int run = 1; run < AbstractUseCase.runs; run++) {
+            for (int run = 1; run <= AbstractUseCase.runs; run++) {
                 switch (String.valueOf(run).length()) {
                     case 1:
                         extractor.generateMasqueradeAttacksUC3(resistence, "00" + run);

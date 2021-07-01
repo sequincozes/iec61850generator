@@ -25,7 +25,7 @@ public class UC00 extends AbstractUseCase {
         int[] resistences = {10, 50, 100};
 
         for (int resistence : resistences) {
-            for (int run = 1; run < AbstractUseCase.runs; run++) {
+            for (int run = 1; run <= AbstractUseCase.runs; run++) {
                 switch (String.valueOf(run).length()) {
                     case 1:
                         extractor.runNormalUC00(resistence, "00" + run);
@@ -67,6 +67,7 @@ public class UC00 extends AbstractUseCase {
 
         /* Write Payload */
         int numLines = formatedCSVFile2.size() - 1;
+        ArrayList<Double> acumulador = new ArrayList<>();
         for (int i = 0; i < numLines; i++) {
             float time = formatedCSVFile2.get(i)[0];
 

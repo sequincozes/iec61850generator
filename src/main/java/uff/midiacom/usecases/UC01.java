@@ -34,7 +34,7 @@ public class UC01 extends AbstractUseCase {
         int numReplayInstances = 1000; // 1000 attacks per scenario
 
         for (int resistence : resistences) {
-            for (int run = 1; run < AbstractUseCase.runs; run++) { // max is 132 (12 x 11)
+            for (int run = 1; run <= AbstractUseCase.runs; run++) { // max is 132 (12 x 11)
                 switch (String.valueOf(run).length()) {
                     case 1:
                         extractor.generateReplayAttacksUC1(resistence, "00" + run, numReplayInstances);

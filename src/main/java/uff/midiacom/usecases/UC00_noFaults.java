@@ -79,7 +79,6 @@ public class UC00_noFaults extends AbstractUseCase {
         }
 
         gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, currentGoose, 0.00631, firstGoose, 6.33000000000011f, 4, 1000);
-        System.out.println(gooseEventManager.getGooseMessages().size());;
 
         /* Write Payload */
         int numLines = formatedCSVFile2.size() - 1;

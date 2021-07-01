@@ -26,7 +26,7 @@ public class UC07 extends AbstractUseCase {
         int[] resistences = {10, 50, 100};
 
         for (int resistence : resistences) {
-            for (int run = 1; run < AbstractUseCase.runs; run++) {
+            for (int run = 1; run <= AbstractUseCase.runs; run++) {
                 switch (String.valueOf(run).length()) {
                     case 1:
                         extractor.runHighHateFloodingUC6(resistence, "00" + run);
@@ -75,7 +75,7 @@ public class UC07 extends AbstractUseCase {
 
         ArrayList<GooseMessage> poisonedGooses = new ArrayList<>();
         int stNum = initialStNum;
-        int sqNum = 0;
+        int sqNum = 1;
         for (int i = 0; i < formatedCSVFile2.size() - 1; i++) {
             float time = formatedCSVFile2.get(i)[0];
             if (time > attackRange[0] && time < attackRange[1]) {
@@ -83,8 +83,8 @@ public class UC07 extends AbstractUseCase {
                 poisonedGoose.setStNum(stNum++);
                 poisonedGoose.setSqNum(sqNum);
                 poisonedGoose.setCbStatus(poisonedGoose.getInverseCbStatus());
-                poisonedGoose.setTimestamp(time + 0.000005);
-                poisonedGoose.setT(time + 0.000005);
+                poisonedGoose.setTimestamp(time + 0.00000001);
+                poisonedGoose.setT(time + 0.00000001);
                 poisonedGooses.add(poisonedGoose);
                 //System.out.println("StNum >" + poisonedGoose.getStNum() + "SqNum > "+poisonedGoose.getSqNum()+", Time>"+poisonedGoose.getTimestamp());
             } else if (time > attackRange[1]) {

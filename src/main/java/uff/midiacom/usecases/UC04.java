@@ -22,7 +22,7 @@ public class UC04 extends AbstractUseCase {
         outputFile = outputLocation + filename;
         UC04 extractor = new UC04();
         System.out.println(outputFile);
-        extractor.attackType = "masquerade_fake_fault";
+        extractor.attackType = "masquerade_fake_normal";
 
         // Masquerade
 //        extractor.gooseEventManager = new GooseEventManager(false, 0, 0, new double[]{0.3, 1.1}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
@@ -32,7 +32,7 @@ public class UC04 extends AbstractUseCase {
         int[] resistences = {10, 50, 100};
 
         for (int resistence : resistences) {
-            for (int run = 1; run < AbstractUseCase.runs; run++) {
+            for (int run = 1; run <= AbstractUseCase.runs; run++) {
                 switch (String.valueOf(run).length()) {
                     case 1:
                         extractor.generateMasqueradeAttacksUC4(resistence, "00" + run);

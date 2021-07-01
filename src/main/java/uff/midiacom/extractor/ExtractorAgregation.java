@@ -24,16 +24,16 @@ public class ExtractorAgregation {
         AbstractUseCase.replace = false;
         AbstractUseCase.printHeader = true;
         AbstractUseCase.runs = 1;
-        System.out.println("Will run UC00:"); UC00.run("train-1run.csv");
+        System.out.println("Will run UC00:"); UC00.run("uc07test.csv");
         AbstractUseCase.printHeader = false;
-        System.out.println("Will run UC00_noFaults:"); UC00_noFaults.run("train_1Run.csv"); // 132 is the max number of runs (faults x segments)
-        System.out.println("Will run UC01:"); UC01.run("train.csv"); //132
-        System.out.println("Will run UC02:"); UC02.run("uc02/uc02.csv");
-        System.out.println("Will run UC03:"); UC03.run("uc03/uc03.csv");
-        System.out.println("Will run UC04:"); UC04.run("uc04/uc04.csv");
-        System.out.println("Will run UC05:"); UC05.run("uc05/uc05.csv");
-        System.out.println("Will run UC06:"); UC06.run("uc06/uc06.csv");
-        System.out.println("Will run UC07:"); UC07.run("uc07/uc07.csv");
+        System.out.println("Will run UC00_noFaults:"); UC00_noFaults.run("uc07test.csv"); // 132 is the max number of runs (faults x segments)
+//        System.out.println("Will run UC01:"); UC01.run("train.csv"); //132
+//        System.out.println("Will run UC02:"); UC02.run("uc02test.csv");
+//        System.out.println("Will run UC03:"); UC03.run("uc03test.csv");
+//        System.out.println("Will run UC04:"); UC04.run("uc04train.csv");
+//        System.out.println("Will run UC05:"); UC05.run("uc05test.csv");
+//        System.out.println("Will run UC06:"); UC06.run("uc06test.csv");
+        System.out.println("Will run UC07:"); UC07.run("uc07test.csv");
 
     }
 
