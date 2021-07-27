@@ -18,8 +18,6 @@ import uff.midiacom.model.GooseMessage;
 public class UC02 extends AbstractUseCase {
 
 
-
-
     public static void run(String filename) throws FileNotFoundException, IOException {
         outputFile = outputLocation + filename;
         UC02 extractor = new UC02();
@@ -61,7 +59,8 @@ public class UC02 extends AbstractUseCase {
      */
     private void generateReplayAttacksUC2(int res, String num, int numReplayInstances) throws IOException {
         restartCounters();
-        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, new double[]{offset+0.5, offset+0.6}, 0.00631, offset + 0.01659, 6.33000000000011f, 4, 1000);
+//        offset = 0;
+        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, new double[]{offset + 0.5, offset + 0.6}, 0.00631, offset + 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};
@@ -84,34 +83,62 @@ public class UC02 extends AbstractUseCase {
             if (defaultHeader) {
                 writeDefaultHeader();
             } else {
-               writeCustomHeader(columns, columns2, columnsGOOSEType, columnsGOOSE);
+                writeCustomHeader(columns, columns2, columnsGOOSEType, columnsGOOSE);
             }
             printHeader = false;
         }
 
         for (int i = 0; i < numReplayInstances; i++) {
-            int minSv = 1;
+            int minSv = numReplayInstances/2; //test
             int maxSv = formatedCSVFile2.size() - 1;
             int svIndex = randomBetween(minSv, maxSv);//(int) (Math.random() * (maxSv - minSv + 1) + minSv); // random SV messages
 
             int minGoose, maxGoose;
             float time = formatedCSVFile2.get(svIndex)[0];
 
-            if (time < 0.5 || time > 0.6) { // SV during normal operation
+            if (time < (offset+0.5) || time > (offset+0.6)) { // SV during normal operation
                 minGoose = 500;
                 maxGoose = 600; // GOOSE during fault
+//                System.out.println("GOOSE during fault");
             } else { // SV during fault
                 if (randomBetween(0, 2) == 1) {// pre or post fault?
                     minGoose = 0;
                     maxGoose = 500; // GOOSE before fault
+//                    System.out.println("GOOSE before fault");
                 } else {
                     minGoose = 600;
                     maxGoose = 1000; // GOOSE after fault
+//                    System.out.println("GOOSE after fault");
                 }
             }
 
-            int gooseTime = randomBetween(minGoose, maxGoose); // random GOOSE inconpatible with SV
-            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," + gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(gooseTime)) + "," + label[2];
+
+            String svHist;
+            if (i > 0) {
+                svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i),formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
+            } else {
+                svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i),formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
+            }
+            float gooseTime = randomBetween(minGoose, maxGoose); // random GOOSE inconpatible with SV
+//            System.out.println("OFFSET: "+offset);
+//            System.out.println("GOOSE TIME: "+gooseTime);
+            gooseTime = gooseTime /1000;
+//            System.out.println("GOOSE TIME: "+gooseTime);
+            gooseTime = gooseTime + offset;
+//            System.out.println("GOOSE TIME: "+gooseTime);
+
+            GooseMessage lastGooseMessage = gooseEventManager.getLastGooseFromSV(gooseTime);
+
+//            System.out.println("SV:"+time+" |Goose time: "+gooseTime+"("+(minGoose+ offset)+"~"+(maxGoose+ offset)+")");
+//            System.out.println("*SV:"+(time-offset)+" |Goose time: "+(gooseTime-offset)+"("+(minGoose)+"~"+(maxGoose)+")");
+//            System.out.println("**SV:"+(time-offset)+" |Goose time: "+(lastGooseMessage.getTimestamp()-offset)+"("+(minGoose)+"~"+(maxGoose)+")");
+
+            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex)
+                    + "," + svHist + "," + lastGooseMessage.asCSVFull()
+                    + getConsistencyFeaturesAsCSV(lastGooseMessage, time) + "," + label[2];
+//            System.out.println(line);
+//            System.exit(0);
+
             write(line);
         }
 

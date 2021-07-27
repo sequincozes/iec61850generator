@@ -98,8 +98,14 @@ public class UC07 extends AbstractUseCase {
             if (time > attackRange[0] && time < attackRange[1]) {
                 String line = "";
                 GooseMessage currentGoose = gooseEventManager.getLastGooseFromSV(time);
-                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + ","
-                        + currentGoose.asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time)) + "," + label[6];
+                String svHist;
+                if (i > 0) {
+                    svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i),formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
+                } else {
+                    svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i),formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
+                }
+                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) +"," + svHist + ","
+                        + currentGoose.asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time), time) + "," + label[7];
                 write(line);
             } else if (time > attackRange[1]) {
                 break; // Generate only messages when no fault is occuring

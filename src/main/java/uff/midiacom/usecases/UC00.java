@@ -7,10 +7,8 @@ package uff.midiacom.usecases;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
 
 import uff.midiacom.goose.GooseEventManager;
-import uff.midiacom.model.GooseMessage;
 
 /**
  * @author silvio
@@ -67,7 +65,6 @@ public class UC00 extends AbstractUseCase {
 
         /* Write Payload */
         int numLines = formatedCSVFile2.size() - 1;
-        ArrayList<Double> acumulador = new ArrayList<>();
         for (int i = 0; i < numLines; i++) {
             float time = formatedCSVFile2.get(i)[0];
 
@@ -78,17 +75,26 @@ public class UC00 extends AbstractUseCase {
 //                System.out.println(gooseEventManager.getLastGooseFromSV(time).getStNum() + "/" + gooseEventManager.getLastGooseFromSV(time).getSqNum());
 //            }
 
-            String line = "";
-            if (time < labelRange[0] & time < labelRange[1]) {
-                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time)) + "," + label[0];
-            } else if (time < labelRange[1]) {
-                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time)) + "," + label[0];
+            String svHist;
+            if (i > 0) {
+                svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i), formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
             } else {
-                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time)) + "," + label[0];
+                svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i), formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
+            }
+
+            String line = "";
+
+            if (time < labelRange[0] & time < labelRange[1]) {
+                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + svHist + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time), time) + "," + label[0];
+            } else if (time < labelRange[1]) {
+                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + svHist + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time), time) + "," + label[0];
+            } else {
+                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + svHist + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time), time) + "," + label[0];
             }
             write(line);
 
         }
     }
+
 
 }

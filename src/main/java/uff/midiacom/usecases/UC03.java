@@ -105,7 +105,13 @@ public class UC03 extends AbstractUseCase {
             if (time >= labelRange[1]) {
                 break;
             } else if (time >= labelRange[0]) {
-                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time)) + "," + label[3];
+                String svHist;
+                if (i > 0) {
+                    svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i),formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
+                } else {
+                    svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i),formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
+                }
+                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + svHist + "," +gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time),time) + "," + label[3];
                 if (gooseEventManager.getLastGooseFromSV(time).getCbStatus() == 1) {
                     write(line);
                 }

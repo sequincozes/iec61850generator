@@ -89,8 +89,8 @@ public class UC01 extends AbstractUseCase {
             Float currentTimestamp = offset + formatedCSVFile.get(svIndex)[0];
 
             // Pickups one old GOOSE randomly
-            GooseMessage randomGoose = gooseEventManager.getGooseMessages().get(randomBetween(0,gooseEventManager.getGooseMessages().size()));
-            while(randomGoose.getTimestamp() > currentTimestamp) { // this ensures that the message is old
+            GooseMessage randomGoose = gooseEventManager.getGooseMessages().get(randomBetween(0, gooseEventManager.getGooseMessages().size()));
+            while (randomGoose.getTimestamp() > currentTimestamp) { // this ensures that the message is old
                 // try again
                 randomGoose = gooseEventManager.getGooseMessages().get(randomBetween(0, gooseEventManager.getGooseMessages().size()));
                 svRandom = new Random(System.nanoTime());
@@ -103,11 +103,16 @@ public class UC01 extends AbstractUseCase {
             // Pickups the last legitimate message
             GooseMessage lastLegitimateGoose = gooseEventManager.getLastGooseFromSV(currentTimestamp);
 
+            String svHist;
+            if (i > 0) {
+                svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i), formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
+            } else {
+                svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i), formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
+            }
+
             // Write line
-            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," +
-                    randomGoose.asCSVFull() +
-                    getConsistencyFeaturesAsCSV(randomGoose, lastLegitimateGoose) +
-                    "," + label[1];
+            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," + svHist + "," + randomGoose.asCSVFull() + getConsistencyFeaturesAsCSV(randomGoose, currentTimestamp) + "," + label[1];
+
             write(line);
 
         }

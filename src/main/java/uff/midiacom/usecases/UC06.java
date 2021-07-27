@@ -59,7 +59,7 @@ public class UC06 extends AbstractUseCase {
      */
     private void generatePoisonedStNumGoose(int res, String num, int numPoisonedStNum) throws IOException {
         restartCounters();
-        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, new double[]{offset+0.5, offset+0.6}, 0.00631, offset + 0.01659, 6.33000000000011f, 4, 1000);
+        gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, new double[]{offset + 0.5, offset + 0.6}, 0.00631, offset + 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};
@@ -106,38 +106,7 @@ public class UC06 extends AbstractUseCase {
 
         /* Write Header and Columns */
         if (printHeader) {
-            if (defaultHeader) {
-                System.out.println("Default header...");
-                writeDefaultHeader();
-            } else {
-                System.out.println("Not default.");
-                write("@relation compiledtraffic");
-
-                for (String column : columns) {
-                    write("@attribute " + column + " numeric ");
-                }
-
-                for (String column : columns2) {
-                    if (!column.equals("Time"))
-                        write("@attribute " + column + " numeric ");
-                }
-
-                for (int i = 0; i < columnsGOOSE.length; i++) {
-                    write("@attribute " + columnsGOOSE[i] + " " + columnsGOOSEType[i]);
-                }
-
-                String classLine = "@attribute @class@ {" +
-                        label[0] + ", " +
-                        label[1] + ", " +
-                        label[2] + ", " +
-                        label[3] + ", " +
-                        label[4] + ", " +
-                        label[5] +
-                        "}";
-
-                write(classLine);
-                write("@data");
-            }
+            writeDefaultHeader();
             printHeader = false;
         }
 
@@ -150,22 +119,33 @@ public class UC06 extends AbstractUseCase {
             int gooseTime = randomBetween(minGoose, maxGoose); // random index, random SV messages
 
             int stNum = randomBetween(10000, 100000);
-            int sqNum = randomBetween(0, 10000);
+            int sqNum = 1;
             int cbStatus = randomBetween(0, 2);
             float timestamp = Float.valueOf(randomBetween(1, 10000)) / 10000;
+            timestamp = timestamp + offset;
             int timeAllowedToLive = randomBetween(0, 100000);
             int confRev = randomBetween(0, 100);
 
             // Last Goose Message from the random time
             GooseMessage gm = gooseEventManager.getLastGooseFromSV(gooseTime);
-            gm.setSqNum(0);
+            gm.setSqNum(sqNum);
             gm.setStNum(stNum);
             gm.setCbStatus(cbStatus);
             gm.setTimestamp(timestamp);
             gm.setConfRev(confRev);
             gm.setGooseTimeAllowedtoLive(timeAllowedToLive);
 
-            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," + gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(gooseTime)) + "," + label[5];
+            String svHist;
+            float time = 0;
+
+            if (i > 0) {
+                svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i), formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
+                time = formatedCSVFile.get(i - 1)[0];
+            } else {
+                svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i), formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
+                time = formatedCSVFile.get(i)[0];
+            }
+            String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," + svHist + "," + gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(gooseTime), time) + "," + label[6];
 //            System.out.println("Timestamp: "+timestamp+" > LINE > "+gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull());
             write(line);
         }

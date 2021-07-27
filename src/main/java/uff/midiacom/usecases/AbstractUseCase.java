@@ -19,10 +19,13 @@ import java.util.StringTokenizer;
 import uff.midiacom.goose.GooseEventManager;
 import uff.midiacom.model.GooseMessage;
 
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
+
 /**
  * @author silvio
  */
-public abstract class AbstractUseCase {
+public abstract class AbstractUseCase extends SVFeatureComposer {
     public static boolean USE_OFFSET = true;
     static float offset;
     public static int runs = 132;
@@ -34,7 +37,7 @@ public abstract class AbstractUseCase {
     public static boolean printHeader = false;
     boolean defaultHeader = true;
     String attackType = "Abstract Attack";
-    String[] label = {"normal", "random_replay", "inverse_replay", "masquerade_fake_fault", "masquerade_fake_normal", "injection","high_StNum", "poisoned_high_rate"};//,"poisoned_high_rate_consistent"};
+    String[] label = {"normal", "random_replay", "inverse_replay", "masquerade_fake_fault", "masquerade_fake_normal", "injection", "high_StNum", "poisoned_high_rate"};//,"poisoned_high_rate_consistent"};
     String columnsGOOSE[] = {"GooseTimestamp", "SqNum", "StNum", "cbStatus", "frameLen", "ethDst", "ethSrc", "ethType", "gooseTimeAllowedtoLive", "gooseAppid", "gooseLen", "TPID", "gocbRef", "datSet", "goID", "test", "confRev", "ndsCom", " numDatSetEntries", "APDUSize", "protocol"};
 
     static int initialStNum;
@@ -196,8 +199,30 @@ public abstract class AbstractUseCase {
         write("@attribute vsmB numeric"); //SV-related 12
         write("@attribute vsmC numeric"); //SV-related 13
 
-        write("@attribute isbATrapArea numeric"); //SV-related 2
+        write("@attribute isbARmsValue numeric"); //SV-related 2
+        write("@attribute isbBRmsValue numeric"); //SV-related 2
+        write("@attribute isbCRmsValue numeric"); //SV-related 2
+        write("@attribute ismARmsValue numeric"); //SV-related 2
+        write("@attribute ismBRmsValue numeric"); //SV-related 2
+        write("@attribute ismCRmsValue numeric"); //SV-related 2
+        write("@attribute vsbARmsValue numeric"); //SV-related 2
+        write("@attribute vsbBRmsValue numeric"); //SV-related 2
+        write("@attribute vsbCRmsValue numeric"); //SV-related 2
+        write("@attribute vsmARmsValue numeric"); //SV-related 2
+        write("@attribute vsmBRmsValue numeric"); //SV-related 2
+        write("@attribute vsmCRmsValue numeric"); //SV-related 2
         write("@attribute isbATrapAreaSum numeric"); //SV-related 2
+        write("@attribute isbBTrapAreaSum numeric"); //SV-related 2
+        write("@attribute isbCTrapAreaSum numeric"); //SV-related 2
+        write("@attribute ismATrapAreaSum numeric"); //SV-related 2
+        write("@attribute ismBTrapAreaSum numeric"); //SV-related 2
+        write("@attribute ismCTrapAreaSum numeric"); //SV-related 2
+        write("@attribute vsbATrapAreaSum numeric"); //SV-related 2
+        write("@attribute vsbBTrapAreaSum numeric"); //SV-related 2
+        write("@attribute vsbCTrapAreaSum numeric"); //SV-related 2
+        write("@attribute vsmATrapAreaSum numeric"); //SV-related 2
+        write("@attribute vsmBTrapAreaSum numeric"); //SV-related 2
+        write("@attribute vsmCTrapAreaSum numeric"); //SV-related 2
 
         write("@attribute t numeric"); // time-based  14
         write("@attribute GooseTimestamp numeric"); // time-based 15
@@ -205,8 +230,8 @@ public abstract class AbstractUseCase {
         write("@attribute StNum numeric"); // Status-based 17
         write("@attribute cbStatus numeric"); // Status-based 18
         write("@attribute frameLen numeric"); //network-based 19
-        write("@attribute ethDst {01:a0:f4:08:2f:77, FF:FF:FF:FF:FF:FF}"); //network-based 20
-        write("@attribute ethSrc {FF:FF:FF:FF:FF:FF, 00:a0:f4:08:2f:77}"); //network-based 21
+        write("@attribute ethDst {01:a0:f4:08:2f:77, FF:FF:FF:FF:FF:11, FF:FF:FF:FF:FF:22, FF:FF:FF:FF:FF:33, FF:FF:FF:FF:FF:44, FF:FF:FF:FF:FF:55, FF:FF:FF:FF:FF:66, FF:FF:FF:FF:FF:FF, FF:FF:FF:FF:FF:77, FF:FF:FF:FF:FF:AA, FF:FF:FF:FF:FF:BB, FF:FF:FF:FF:FF:CC, FF:FF:FF:FF:FF:DD, FF:FF:FF:FF:FF:EE, FF:FF:FF:FF:FF:AB, FF:FF:FF:FF:FF:AC}"); //network-based 20
+        write("@attribute ethSrc {00:a0:f4:08:2f:77, FF:FF:FF:FF:FF:11, FF:FF:FF:FF:FF:22, FF:FF:FF:FF:FF:33, FF:FF:FF:FF:FF:44, FF:FF:FF:FF:FF:55, FF:FF:FF:FF:FF:66, FF:FF:FF:FF:FF:FF, FF:FF:FF:FF:FF:77, FF:FF:FF:FF:FF:AA, FF:FF:FF:FF:FF:BB, FF:FF:FF:FF:FF:CC, FF:FF:FF:FF:FF:DD, FF:FF:FF:FF:FF:EE, FF:FF:FF:FF:FF:AB, FF:FF:FF:FF:FF:AC}"); //network-based 21
         write("@attribute ethType {0x000077b7, 0x000088b8}"); //network-based 22
         write("@attribute gooseTimeAllowedtoLive numeric"); //IED-based 23
         write("@attribute gooseAppid {0x00003002, 0x00003001}");  //IED-based 24
@@ -230,6 +255,7 @@ public abstract class AbstractUseCase {
         write("@attribute timestampDiff numeric"); // temporal consistency 42
         write("@attribute tDiff numeric"); // temporal consistency 43
         write("@attribute timeFromLastChange numeric"); // temporal consistency 44
+        write("@attribute delay numeric"); // temporal consistency 45
         String classLine = "@attribute @class@ {"
                 + label[0] + ", "
                 + label[1] + ", "
@@ -237,15 +263,15 @@ public abstract class AbstractUseCase {
                 + label[3] + ", "
                 + label[4] + ", "
                 + label[5] + ", "
-                + label[6] //+ ", "
-                //    + label[7]
+                + label[6] + ", "
+                + label[7]
                 + "}";
 
         write(classLine);
         write("@data");
     }
 
-    protected String getConsistencyFeaturesAsCSV(GooseMessage gm) {
+    protected String getConsistencyFeaturesAsCSV(GooseMessage gm, double currentSVTime) {
 
         if (gm.getStNum() == 0) {
             gm.setSqNum(initialSqNum);
@@ -260,47 +286,36 @@ public abstract class AbstractUseCase {
         int frameLenthDiff = gm.getFrameLen() - prev.getFrameLen();
         double timestampDiff = gm.getTimestamp() - prev.getTimestamp();
         double tDiff = (Double.valueOf(gm.getT()) - Double.valueOf(prev.getT()));
+        double delay = currentSVTime - gm.getTimestamp();
 
         //ystem.out.println("Goose (st/sq/time): " + gm.getStNum() + "," + gm.getSqNum() + "," + time + ", Coisinhas:" + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", " + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", " + timestampDiff + ", " + tDiff);
         return "," + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", "
                 + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", "
-                + timestampDiff + ", " + tDiff  +", " + ( gm.getTimestamp()- gm.getT());
+                + timestampDiff + ", " + tDiff + ", " + (gm.getTimestamp() - gm.getT()) + ", " + delay;
     }
 
-    protected String getConsistencyFeaturesAsCSV(GooseMessage curent, GooseMessage previous) {
+//    protected String getConsistencyFeaturesAsCSV(GooseMessage curent, GooseMessage previous) {
+//
+//        if (curent.getStNum() == 0) {
+//            curent.setSqNum(initialSqNum);
+//            curent.setStNum(initialStNum);
+//        }
+//        int stDiff = curent.getStNum() - previous.getStNum();
+//        int sqDiff = curent.getSqNum() - previous.getSqNum();
+//        int gooseLenghtDiff = curent.getGooseLen() - previous.getGooseLen();
+//        int cbStatusDiff = curent.isCbStatus() - previous.isCbStatus();
+//        int apduSizeDiff = curent.getApduSize() - previous.getApduSize();
+//        int frameLenthDiff = curent.getFrameLen() - previous.getFrameLen();
+//        double timestampDiff = curent.getTimestamp() - previous.getTimestamp();
+//        double tDiff = (Double.valueOf(curent.getT()) - Double.valueOf(previous.getT()));
+//        double timeFromLastChange = curent.getTimestamp() - curent.getT();
+//        double delay = currentSVTime - gm.getTimestamp();
+//
+//        //ystem.out.println("Goose (st/sq/time): " + gm.getStNum() + "," + gm.getSqNum() + "," + time + ", Coisinhas:" + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", " + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", " + timestampDiff + ", " + tDiff);
+//        return "," + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", "
+//                + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", "
+//                + timestampDiff + ", " + tDiff + ", " + timeFromLastChange;
+//    }
 
-        if (curent.getStNum() == 0) {
-            curent.setSqNum(initialSqNum);
-            curent.setStNum(initialStNum);
-        }
-        int stDiff = curent.getStNum() - previous.getStNum();
-        int sqDiff = curent.getSqNum() - previous.getSqNum();
-        int gooseLenghtDiff = curent.getGooseLen() - previous.getGooseLen();
-        int cbStatusDiff = curent.isCbStatus() - previous.isCbStatus();
-        int apduSizeDiff = curent.getApduSize() - previous.getApduSize();
-        int frameLenthDiff = curent.getFrameLen() - previous.getFrameLen();
-        double timestampDiff = curent.getTimestamp() - previous.getTimestamp();
-        double tDiff = (Double.valueOf(curent.getT()) - Double.valueOf(previous.getT()));
-        double timeFromLastChange = curent.getTimestamp() - curent.getT();
 
-        //ystem.out.println("Goose (st/sq/time): " + gm.getStNum() + "," + gm.getSqNum() + "," + time + ", Coisinhas:" + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", " + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", " + timestampDiff + ", " + tDiff);
-        return "," + stDiff + ", " + sqDiff + ", " + gooseLenghtDiff + ", "
-                + cbStatusDiff + ", " + apduSizeDiff + ", " + frameLenthDiff + ", "
-                + timestampDiff + ", " + tDiff + ", " + timeFromLastChange;
-    }
-
-    public static double getTrapezioArea(double x0, double x1, double fx0, double fx1) {
-        double trap;
-        trap = (fx1 + fx0) * (x1 - x0) / 2.00;
-        System.out.println(trap);
-        return trap;
-    }
-
-    public static double getSumTrapezioArea(double[] v) {
-        double areat = 0;
-        for (int i = 0; i < v.length; i++) {
-            areat = areat + v[i];
-        }
-        return areat;
-    }
 }

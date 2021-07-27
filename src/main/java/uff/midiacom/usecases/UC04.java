@@ -99,12 +99,24 @@ public class UC04 extends AbstractUseCase {
             if (time >= labelRange[1]) {
                 break;
             } else if (time >= labelRange[0]) {
-                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time)) + "," + label[3];
+                String svHist;
+                if (i > 0) {
+                    svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i),formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
+                } else {
+                    svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i),formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
+                }
+                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + svHist + "," +gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time), time) + "," + label[4];
                 if (gooseEventManager.getLastGooseFromSV(time).getCbStatus() == 0) {
                     write(line);
                 }
             } else if (time >= (labelRange[0] - 0.1) && time < labelRange[0]) { // write some normals to avoid errors of single class bla bla
-                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time)) + "," + label[3];
+                String svHist;
+                if (i > 0) {
+                    svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i),formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
+                } else {
+                    svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i),formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
+                }
+                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i)+ "," + svHist + "," +gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time), time) + "," + label[4];
                 write(line);
             }
             if (lastGooseTimestamp != gooseEventManager.getLastGooseFromSV(time).getTimestamp()) {

@@ -85,9 +85,15 @@ public class UC00_noFaults extends AbstractUseCase {
         for (int i = 0; i < 2382; i++) {
             float time = formatedCSVFile2.get(i)[0];
             String line = "";
-            line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + ","
+            String svHist;
+            if (i > 0) {
+                svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i),formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
+            } else {
+                svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i),formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
+            }
+            line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + ","+svHist+","
                     + gooseEventManager.getLastGooseFromSV(time).asCSVFull()
-                    + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time))
+                    + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time), time)
                     + "," + label[0];
             write(line);
         }
@@ -95,10 +101,17 @@ public class UC00_noFaults extends AbstractUseCase {
         /* Write Payload */
         for (int i = 0; i < numLines - 2381; i++) {
             float time = formatedCSVFile2.get(i)[0] + Float.valueOf((float) 0.5);
+            String svHist;
+            if (i > 0) {
+                svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i),formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
+            } else {
+                svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i),formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
+            }
             String line = "";
-            line = joinColumns(formatedCSVFile, 0.5 + (float) 0.000010009, formatedCSVFile2, columns, columns2, i) + ","
+            line = joinColumns(formatedCSVFile, 0.5 + (float) 0.000010009, formatedCSVFile2, columns, columns2, i)
+                    + "," + svHist + ","
                     + gooseEventManager.getLastGooseFromSV(time).asCSVFull()
-                    + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time))
+                    + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time), time)
                     + "," + label[0];
             write(line);
             endtimeLastRun = line.split(",")[0];

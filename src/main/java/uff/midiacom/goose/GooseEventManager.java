@@ -58,7 +58,10 @@ public final class GooseEventManager {
     public GooseMessage getLastGooseFromSV(double timestamp) {
         GooseMessage lastGooseMessage = gooseMessages.get(0);
         for (GooseMessage gooseMessage : gooseMessages) {
+//            System.out.println("Buscando: SV "+timestamp+" em GOOSE: "+gooseMessage.getTimestamp());
             if (gooseMessage.getTimestamp() > timestamp) {
+//                System.out.println("ACHOU: depois de "+timestamp+" veio "+gooseMessage.getTimestamp());
+//                System.exit(0);
                 return lastGooseMessage;
             } else {
                 lastGooseMessage = gooseMessage;
@@ -179,53 +182,6 @@ public final class GooseEventManager {
         }
         return this.gooseMessages;
     }
-    //@Deprecated
-//    public ArrayList<GooseMessage> generateGooseMessagesForUC01() {
-//        this.gooseMessages = new ArrayList<>();
-//        int stNum = getInitialStNum();
-//        int sqNum = getInitialSqNum();
-//        boolean cbStatus = isInitialCbStatus();
-//        GooseMessage periodicGoose = new GooseMessage(toInt(cbStatus), stNum, sqNum, getFirstGooseTime(), getFirstGooseTime());
-//        this.gooseMessages.add(periodicGoose);              // periodic message
-//        if (debug) {
-//            System.out.println(getPreviousGoose(periodicGoose).asCSVFull());
-//            System.out.println(periodicGoose.asCSVFull());
-//        }
-//
-//        for (double eventTimestamp : getEventsTimestamp()) {
-//            // Status change
-//            cbStatus = !cbStatus;
-//            stNum = stNum + 1;
-//            sqNum = 1;
-//            double timestamp = getDelayFromEvent() + eventTimestamp;
-//            double t = timestamp; // new t
-//
-////            System.out.println(t);
-//            for (double interval : gettIntervals()) { // GOOSE BURST MODE
-//                if (eventTimestamp == getEventsTimestamp()[0] && interval >= getEventsTimestamp()[1]) {
-//                    break;
-//                } else {
-//                    GooseMessage gm = new GooseMessage(
-//                            toInt(cbStatus), // current status
-//                            stNum, // same stNum
-//                            sqNum++, // increase sqNum
-//                            timestamp, // current timestamp
-//                            t // timestamp of last st change
-//                    );
-//                    if (debug) {
-//                        System.out.println(gm.asCSVFull());
-//                    }
-//                    this.gooseMessages.add(gm);
-//                    timestamp = timestamp + interval;                               // burst mode
-//
-//                }
-//            }
-//        }
-//        if (debug) {
-//            System.exit(0);
-//        }
-//        return this.gooseMessages;
-//    }
 
     public double[] exponentialBackoff(long minTime, long maxTime, double intervalMultiplier) {
         long retryIntervalMs = minTime;
@@ -279,6 +235,7 @@ public final class GooseEventManager {
 
         return arrayIntervals;
     }
+
     public int getInitialStNum() {
         return initialStNum;
     }
@@ -376,9 +333,13 @@ public final class GooseEventManager {
 
     }
 
-    private long getRandomTime(){
+    private long getRandomTime() {
         Random gooseRandom = new Random(System.nanoTime());
         return gooseRandom.nextInt(1000); // random index, random SV messages
+    }
+
+    private int getRandomTimeBetween(int low, int high) {
+        return new Random(System.currentTimeMillis()).nextInt(high - low) + low;
     }
 
 }

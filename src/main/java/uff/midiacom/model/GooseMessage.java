@@ -5,10 +5,12 @@
  */
 package uff.midiacom.model;
 
+import java.io.Serializable;
+
 /**
  * @author silvio
  */
-public class GooseMessage {
+public class GooseMessage implements Comparable<GooseMessage> {
 
     private int cbStatus;                   // DYNAMICALLY GENERATED 
     private int stNum;                      // DYNAMICALLY GENERATED 
@@ -35,12 +37,27 @@ public class GooseMessage {
     public static String ndsCom = "FALSE";
     public static String protocol = "GOOSE";
 
+    public boolean isInverseReplay = false;
+
     public GooseMessage(int cbStatus, int stNum, int sqNum, double timestamp, double t) {
         this.cbStatus = cbStatus;
         this.stNum = stNum;
         this.sqNum = sqNum;
         this.timestamp = timestamp;
         this.t = t;
+
+        ethDst = "01:a0:f4:08:2f:77";
+        ethSrc = "00:a0:f4:08:2f:77";
+        ethType = "0x000088b8";
+        gooseAppid = "0x00003001";
+        TPID = "0x8100";
+        gocbRef = "LD/LLN0$GO$gcbA";
+        datSet = "LD/LLN0$IntLockA";
+        goID = "InterlockingA";
+        test = "FALSE";
+        ndsCom = "FALSE";
+        protocol = "GOOSE";
+
     }
 
     public int isCbStatus() {
@@ -127,6 +144,10 @@ public class GooseMessage {
         return getTimestamp() + "," + getSqNum() + "," + getStNum() + "," + cbStatus;
     }
 
+    public String asDebug() {
+        return getTimestamp() + "|"+ getT() + "|" + getSqNum() + "|" + getStNum() + "|" + cbStatus;
+    }
+
     public String asCSVinverseStatus() {
         if (cbStatus == 1) {
             return getTimestamp() + "," + getSqNum() + "," + getStNum() + "," + 0;
@@ -174,4 +195,12 @@ public class GooseMessage {
         this.confRev = confRev;
     }
 
+    @Override
+    public int compareTo(GooseMessage gooseMessage) {
+        if (gooseMessage.getTimestamp() >= getTimestamp()) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
 }
