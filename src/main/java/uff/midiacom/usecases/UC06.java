@@ -58,7 +58,7 @@ public class UC06 extends AbstractUseCase {
      * @throws IOException
      */
     private void generatePoisonedStNumGoose(int res, String num, int numPoisonedStNum) throws IOException {
-        restartCounters();
+        float offset = restartCounters();
         gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, new double[]{offset + 0.5, offset + 0.6}, 0.00631, offset + 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */

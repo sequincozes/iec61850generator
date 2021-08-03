@@ -61,7 +61,7 @@ public class UC05 extends AbstractUseCase {
      * @throws java.io.IOException
      */
     private void generateInjectionAttacksUC5(int res, String num, int numInjectionAttacks) throws IOException {
-        restartCounters();
+        float offset = restartCounters();
         gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum, new double[]{offset + 0.5, offset + 0.6}, 0.00631, offset + 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
@@ -145,6 +145,8 @@ public class UC05 extends AbstractUseCase {
             printHeader = false;
         }
 
+        double lastGooseTimestamp = -1;
+
         for (int i = 0; i < numInjectionAttacks; i++) {
             int minSv = 1;
             int maxSv = formatedCSVFile2.size() - 1;
@@ -156,7 +158,7 @@ public class UC05 extends AbstractUseCase {
             int stNum = randomBetween(0, 10000);
             int sqNum = randomBetween(0, 10000);
             int cbStatus = randomBetween(0, 2);
-            float timestamp = Float.valueOf(randomBetween(1, 10000)) / 10000;
+//            float timestamp = Float.valueOf(randomBetween(1, 10000)) / 1000;
             int timeAllowedToLive = randomBetween(0, 100000);
             int confRev = randomBetween(0, 100);
 
@@ -165,7 +167,7 @@ public class UC05 extends AbstractUseCase {
             gm.setSqNum(sqNum);
             gm.setStNum(stNum);
             gm.setCbStatus(cbStatus);
-            gm.setTimestamp(timestamp);
+//            gm.setTimestamp(timestamp);
             gm.setConfRev(confRev);
             gm.setGooseTimeAllowedtoLive(timeAllowedToLive);
             String svHist;
@@ -180,6 +182,10 @@ public class UC05 extends AbstractUseCase {
             String line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, svIndex) + "," + svHist + "," + gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(gooseTime), time) + "," + label[5];
 //            System.out.println("Timestamp: "+timestamp+" > LINE > "+gooseEventManager.getLastGooseFromSV(gooseTime).asCSVFull());
             write(line);
+            if (lastGooseTimestamp != gooseEventManager.getLastGooseFromSV(time).getTimestamp()) {
+                lastGooseTimestamp = gooseEventManager.getLastGooseFromSV(time).getTimestamp();
+                System.out.println("[5] "+gooseEventManager.getLastGooseFromSV(time).getTimestamp()+" / "+gooseEventManager.getLastGooseFromSV(time).getFrameLen());
+            }
         }
 
     }

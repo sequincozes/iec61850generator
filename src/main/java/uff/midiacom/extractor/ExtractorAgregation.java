@@ -25,10 +25,10 @@ public class ExtractorAgregation {
 //        runUC01();//
 //        runUC02();
 //        runUC03();
-//        runUC04();
+        runUC04();
 //        runUC05();
 //        runUC06();
-        runUC07();
+//        runUC07();
 
 
         AbstractUseCase.outputLocation = "/home/silvio/datasets/Full_SV_2021/consistency_v7/100pct/";;

@@ -64,6 +64,7 @@ public class UC00 extends AbstractUseCase {
         }
 
         /* Write Payload */
+        double lastGooseTimestamp = -1;
         int numLines = formatedCSVFile2.size() - 1;
         for (int i = 0; i < numLines; i++) {
             float time = formatedCSVFile2.get(i)[0];
@@ -92,7 +93,10 @@ public class UC00 extends AbstractUseCase {
                 line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + svHist + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time), time) + "," + label[0];
             }
             write(line);
-
+            if (lastGooseTimestamp != gooseEventManager.getLastGooseFromSV(time).getTimestamp()) {
+                lastGooseTimestamp = gooseEventManager.getLastGooseFromSV(time).getTimestamp();
+                System.out.println("[0] "+gooseEventManager.getLastGooseFromSV(time).getT()+" / "+gooseEventManager.getLastGooseFromSV(time).getFrameLen());
+            }
         }
     }
 

@@ -48,7 +48,7 @@ public class UC07 extends AbstractUseCase {
      * Increases StNum at high rate
      */
     private void runHighHateFloodingUC6(int res, String num) throws IOException {
-        restartCounters();
+        float offset = restartCounters();
         gooseEventManager = new GooseEventManager(false, initialStNum, initialSqNum,  new double[]{offset+0.5, offset+0.6}, 0.00631, offset+0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */

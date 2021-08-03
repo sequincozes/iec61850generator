@@ -29,6 +29,7 @@ public class UC03 extends AbstractUseCase {
         outputFile = outputLocation + filename;
         UC03 extractor = new UC03();
         extractor.attackType = "masquerade_fake_fault";
+
         // Masquerade
 //        extractor.gooseEventManager = new GooseEventManager(false, 0, 0, new double[]{0.3, 1.1}, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
 
@@ -64,7 +65,7 @@ public class UC03 extends AbstractUseCase {
      * @throws java.io.FileNotFoundException
      */
     private void generateMasqueradeAttacksUC3(int res, String num) throws IOException {
-        restartCounters();
+        float offset = restartCounters();
         // SV time range to generate a fake fault burst of GOOSE messages
         double[][] labelRanges = {{offset+0.0, offset+0.1}, {offset+0.1, offset+0.2}, {offset+0.2, offset+0.3}, {offset+0.3, offset+0.4}, {offset+0.4, offset+0.5}, {offset+0.6, offset+0.7}, {offset+0.7, offset+0.8}, {offset+0.8, offset+0.9}, {offset+0.9, offset+1.0}};
         double[] labelRange = labelRanges[randomBetween(0, 9)];

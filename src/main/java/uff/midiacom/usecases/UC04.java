@@ -59,10 +59,11 @@ public class UC04 extends AbstractUseCase {
      * @throws java.io.FileNotFoundException
      */
     private void generateMasqueradeAttacksUC4(int res, String num) throws IOException {
-        restartCounters();
+//        restartCounters();
+        float offset = restartCounters();
         // SV time range to generate a fake fault burst of GOOSE messages
-        double[] labelRange = {offset+0.5, offset+0.6};
-        gooseEventManager = new GooseEventManager(true, initialStNum, initialSqNum, labelRange, 0.00631, 0.01659, 6.33000000000011f, 4, 1000);
+        double[] labelRange = {offset + 0.5, offset + 0.6};
+        gooseEventManager = new GooseEventManager(true, initialStNum, initialSqNum, labelRange, 0.00631, offset + 0.01659, 6.33000000000011f, 4, 1000);
 
         /* Extract First Part */
         String columns[] = {"Time", "isbA", "isbB", "isbC", "ismA", "ismB", "ismC", "vsbA", "vsbB", "vsbC", "vsmA"};
@@ -101,27 +102,30 @@ public class UC04 extends AbstractUseCase {
             } else if (time >= labelRange[0]) {
                 String svHist;
                 if (i > 0) {
-                    svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i),formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
+                    svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i), formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
                 } else {
-                    svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i),formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
+                    svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i), formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
                 }
-                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + svHist + "," +gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time), time) + "," + label[4];
+                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + svHist + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time), time) + "," + label[4];
                 if (gooseEventManager.getLastGooseFromSV(time).getCbStatus() == 0) {
                     write(line);
                 }
-            } else if (time >= (labelRange[0] - 0.1) && time < labelRange[0]) { // write some normals to avoid errors of single class bla bla
-                String svHist;
-                if (i > 0) {
-                    svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i),formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
-                } else {
-                    svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i),formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
-                }
-                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i)+ "," + svHist + "," +gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time), time) + "," + label[4];
-                write(line);
             }
+//            else if (time >= (labelRange[0] - 0.1) && time < labelRange[0]) { // write some normals to avoid errors of single class bla bla
+//                String svHist;
+//                if (i > 0) {
+//                    svHist = getSVHistorical(formatedCSVFile.get(i - 1), formatedCSVFile.get(i), formatedCSVFile2.get(i - 1), formatedCSVFile2.get(i));
+//                } else {
+//                    svHist = getSVHistorical(formatedCSVFile.get(i), formatedCSVFile.get(i), formatedCSVFile2.get(i), formatedCSVFile2.get(i)); // just to initialize
+//                }
+//                line = joinColumns(formatedCSVFile, formatedCSVFile2, columns, columns2, i) + "," + svHist + "," + gooseEventManager.getLastGooseFromSV(time).asCSVFull() + getConsistencyFeaturesAsCSV(gooseEventManager.getLastGooseFromSV(time), time) + "," + label[4];
+////                if (gooseEventManager.getLastGooseFromSV(time).getCbStatus() == 0) {
+//                    write(line);
+////                }
+//            }
             if (lastGooseTimestamp != gooseEventManager.getLastGooseFromSV(time).getTimestamp()) {
                 lastGooseTimestamp = gooseEventManager.getLastGooseFromSV(time).getTimestamp();
-//                System.out.println(gooseEventManager.getLastGooseFromSV(time).asCSVFull());
+                System.out.println("[4] " + gooseEventManager.getLastGooseFromSV(time).getT() + " / " + gooseEventManager.getLastGooseFromSV(time).getCbStatus() + " / " + label[4]);
             }
         }
 
