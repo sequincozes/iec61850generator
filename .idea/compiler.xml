@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="SVGenerator" />
+        <module name="ERENOFramework" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="SVGenerator" target="11" />
+      <module name="ERENOFramework" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

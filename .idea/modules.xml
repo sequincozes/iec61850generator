@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SVGenerator.iml" filepath="$PROJECT_DIR$/SVGenerator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ERENOFramework.iml" filepath="$PROJECT_DIR$/ERENOFramework.iml" />
     </modules>
   </component>
 </project>

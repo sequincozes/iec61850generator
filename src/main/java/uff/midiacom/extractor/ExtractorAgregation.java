@@ -17,7 +17,7 @@ public class ExtractorAgregation {
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
 //        java -jar assessAdFS.jar fs 2 >> fs_uc02.txt
-        AbstractUseCase.outputLocation = "/home/silvio/datasets/Full_SV_2021/consistency_v7/10pct/";;
+        AbstractUseCase.outputLocation = "/home/silvio/datasets/Full_SV_2021/consistency_v8/10pct/";;
         AbstractUseCase.generateSingleRound = false;
         AbstractUseCase.replace = false;
         AbstractUseCase.runs = 13;
@@ -25,13 +25,13 @@ public class ExtractorAgregation {
 //        runUC01();//
 //        runUC02();
 //        runUC03();
-        runUC04();
-//        runUC05();
+//        runUC04();
+        runUC05();
 //        runUC06();
 //        runUC07();
 
 
-        AbstractUseCase.outputLocation = "/home/silvio/datasets/Full_SV_2021/consistency_v7/100pct/";;
+        AbstractUseCase.outputLocation = "/home/silvio/datasets/Full_SV_2021/consistency_v8/100pct/";;
         AbstractUseCase.generateSingleRound = false;
         AbstractUseCase.replace = false;
         AbstractUseCase.runs = 132;
