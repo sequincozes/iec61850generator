@@ -16,11 +16,8 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
-import uff.midiacom.goose.GooseEventManager;
+import uff.midiacom.controller.GooseEventManager;
 import uff.midiacom.model.GooseMessage;
-
-import static java.lang.Math.pow;
-import static java.lang.Math.sqrt;
 
 /**
  * @author silvio

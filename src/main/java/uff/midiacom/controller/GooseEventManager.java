@@ -3,10 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package uff.midiacom.goose;
+package uff.midiacom.controller;
 
 import uff.midiacom.model.GooseMessage;
-import uff.midiacom.usecases.UseCases;
 
 import java.util.ArrayList;
 import java.util.Random;

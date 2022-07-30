@@ -3,38 +3,32 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package uff.midiacom.sv;
+package uff.midiacom.extractor;
 
 import uff.midiacom.usecases.AbstractUseCase;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
 /**
- *
  * @author silvio
  */
-public class ExtractorSvOnly {
+public class JustJoinSVColunns {
 
     BufferedWriter bw;
-    String outputFile = "/home/silvio/datasets/Full_SV_2020/full_compilation_2.csv";
 
-    public static void main(String[] args) throws FileNotFoundException, IOException {
-        ExtractorSvOnly extractor = new ExtractorSvOnly();
-        
-        extractor.startWriting();
-        
+    public static void main(String[] args) throws IOException {
+        JustJoinSVColunns extractor = new JustJoinSVColunns();
+
+
         int[] resistences = {10, 50, 100};
-        
+
         for (int resistence : resistences) {
             for (int run = 1; run < 132; run++) {
+                String outputFile = "/home/silvio/datasets/Full_SV_2020/resistence_" + resistence + "/second_" + run + ".csv";
+                extractor.startWriting(outputFile);
                 switch (String.valueOf(run).length()) {
                     case 1:
                         extractor.run(resistence, "00" + run);
@@ -46,9 +40,10 @@ public class ExtractorSvOnly {
                         extractor.run(resistence, String.valueOf(run));
                         break;
                 }
+                extractor.finishWriting();
             }
         }
-        
+
         extractor.finishWriting();
     }
 
@@ -57,7 +52,7 @@ public class ExtractorSvOnly {
         /* Extract First Part */
         String columns[] = {"Col1", "Col2", "Col3", "Col4", "Col5", "Col6", "Col7", "Col8", "Col9", "Col10", "Col11"};
         ArrayList<Float[]> formatedCSVFile;
-        if(AbstractUseCase.USE_OFFSET) {
+        if (AbstractUseCase.USE_OFFSET) {
             formatedCSVFile = consumeFloat("/home/silvio/datasets/Full_SV_2020/resistencia" + res + "/SILVIO_r00" + num + "_01.out", 1, columns);
         } else {
             formatedCSVFile = consumeFloat("/home/silvio/datasets/Full_SV_2020/resistencia" + res + "/SILVIO_r00" + num + "_01.out", 1, columns);
@@ -66,7 +61,7 @@ public class ExtractorSvOnly {
         String columns2[] = {"Col12", "Col13", "Col14"};
         ArrayList<Float[]> formatedCSVFile2 = consumeFloat("/home/silvio/datasets/Full_SV_2020/resistencia" + res + "/SILVIO_r00" + num + "_02.out", 1, columns2);
 
-        String[] label = {"normal", "falta", "normal"};
+        String[] label = {"normal", "fault", "normal"};
         double[] labelRange = {0.5, 0.6};
         for (int i = 0; i < formatedCSVFile2.size() - 1; i++) {
             float time = formatedCSVFile2.get(i)[0];
@@ -105,7 +100,7 @@ public class ExtractorSvOnly {
         ArrayList<Float[]> formatedCSVFile = new ArrayList<>();
         try {
             File myObj = new File(file);
-            try ( Scanner myReader = new Scanner(myObj)) {
+            try (Scanner myReader = new Scanner(myObj)) {
                 myReader.nextLine(); // Skip blank line
                 while (myReader.hasNextLine()) {
                     String data = myReader.nextLine();
@@ -148,7 +143,7 @@ public class ExtractorSvOnly {
         bw.newLine();
     }
 
-    private void startWriting() throws FileNotFoundException, IOException {
+    private void startWriting(String outputFile) throws FileNotFoundException, IOException {
         File fout = new File(outputFile);
         FileOutputStream fos = new FileOutputStream(fout);
         bw = new BufferedWriter(new OutputStreamWriter(fos));

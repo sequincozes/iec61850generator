@@ -5,7 +5,7 @@
  */
 package uff.midiacom.usecases;
 
-import uff.midiacom.goose.GooseEventManager;
+import uff.midiacom.controller.GooseEventManager;
 import uff.midiacom.model.GooseMessage;
 
 import java.io.IOException;

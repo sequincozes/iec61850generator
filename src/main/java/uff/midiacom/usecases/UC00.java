@@ -8,7 +8,7 @@ package uff.midiacom.usecases;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import uff.midiacom.goose.GooseEventManager;
+import uff.midiacom.controller.GooseEventManager;
 
 /**
  * @author silvio

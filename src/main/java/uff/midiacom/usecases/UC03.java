@@ -5,18 +5,10 @@
  */
 package uff.midiacom.usecases;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.StringTokenizer;
 
-import uff.midiacom.goose.GooseEventManager;
+import uff.midiacom.controller.GooseEventManager;
 import uff.midiacom.model.GooseMessage;
 
 /**

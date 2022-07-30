@@ -5,11 +5,10 @@
  */
 package uff.midiacom.usecases;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import uff.midiacom.goose.GooseEventManager;
+import uff.midiacom.controller.GooseEventManager;
 import uff.midiacom.model.GooseMessage;
 
 /**
